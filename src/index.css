@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Qanelas-bold";
+  src: url("./assets/fonts/Qanelas-bold.otf");
+}
+@font-face {
+  font-family: "Qanelas-medium";
+  src: url("./assets/fonts/Qanelas-medium.otf");
+}
+@font-face {
+  font-family: "Qanelas-light";
+  src: url("./assets/fonts/Qanelas-light.otf");
+}
+@font-face {
+  font-family: "Nexa";
+  src: url("./assets/fonts/Nexa.woff");
+}
+* {
+  font-family: "Nexa", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+  transition: all 0.35s ease-in;
+  scroll-behavior: smooth;
+}
+body,
+html {
+  overflow-x: hidden;
+  color: #09090b;
+  font-weight: 500;
+}
