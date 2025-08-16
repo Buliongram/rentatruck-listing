@@ -1,5 +1,5 @@
 import React from "react";
-import { banner } from "../../assets/images/images";
+import { banner, banner1 } from "../../assets/images/images";
 import { GoArrowDownRight } from "react-icons/go";
 import { FiPhoneCall } from "react-icons/fi";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -10,7 +10,7 @@ import { GrMapLocation } from "react-icons/gr";
 export default function Hero() {
   return (
     <section className="lg:h-[130dvh] relative bg-gradient-to-b from-[#01495c] to-[#02637e] flex items-center flex-col lg:flex-row justify-center lg:p-20 gap-16 lg:gap-28 p-8 py-28">
-      {/* <img src={banner} className="absolute top-0 left-0 w-full h-full object-cover opacity-20" alt="banner" /> */}
+      <img src={banner1} className="absolute top-0 left-0 w-full h-full object-cover opacity-60" alt="banner" />
       <main className="flex flex-col gap-6 w-full relative  text-white">
         <div className="flex items-center text-[10px] lg:text-xs">
           <span className="border rounded-full border-white p-2 px-5">
@@ -21,11 +21,10 @@ export default function Hero() {
           </span>
         </div>
 
-        <h1 className=" text-6xl lg:text-7xl font-black leading-[1.05]">
-          Exploring <span className=" text-6xl lg:text-[80px]"> Unique Homes</span> <br />
-          In Market
+        <h1 className=" text-4xl lg:text-7xl font-black leading-[1]">
+          Exploring Unique Homes In Market
         </h1>
-        <p className="text-sm lg:text-[16px] max-w-[450px]">
+        <p className="text-sm font-normal lg:text-[16px] max-w-[450px]">
           A great platform to buy, sell, or even rent your properties without
           any commissions
         </p>
