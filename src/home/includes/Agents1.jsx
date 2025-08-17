@@ -1,7 +1,4 @@
-import React from "react";
-import { GoArrowDownRight, GoArrowUpRight, GoLocation } from "react-icons/go";
-import { banner } from "../../assets/images/images";
-import { Link } from "react-router-dom";
+
 import AgentSlide from "../components/AgentSlide";
 export default function Agents1() {
   return (

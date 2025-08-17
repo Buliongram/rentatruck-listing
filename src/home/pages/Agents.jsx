@@ -1,36 +1,43 @@
-import React, { useState } from "react";
-import { faqs } from "../../data/faq";
+import AgentCard from "../../components/AgentCard";
+import { agentsData } from "../../data/agentData";
+import { MdOutlineRealEstateAgent } from "react-icons/md";
+import { agentsFaq } from "../../data/faq";
 import { BiChevronRight } from "react-icons/bi";
+import { useState } from "react";
+import OurAgents from "../includes/OurAgents";
 
-export default function Faq() {
+export default function Agents() {
   const [openIndex, setOpenIndex] = useState(null);
   const toggleFaq = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
   return (
     <>
-      <section className=" p-8 py-12 lg:p-28 lg:py-14 flex flex-col items-center gap-10">
-        <section className="flex flex-col lg:flex-row gap-5 items-center lg:items-start justify-between w-full">
+      {" "}
+      <section className="flex flex-col gap-10 py-28 lg:p-28 lg:pb-0">
+        <section className="flex flex-col items-center gap-2 w-full">
+          <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1 w-max">
+            <MdOutlineRealEstateAgent />
+            <p className=" uppercase" data-aos="flip-up">
+              Our Agents
+            </p>
+          </span>
+          <h1
+            className="text-3xl lg:text-5xl font-normal text-center max-w-[700px] w-full mx-auto"
+            data-aos="fade-left"
+          >
+            Start Your Journey With Our Amazing Agents
+          </h1>
+        </section>
 
-          
-          <h2
-            className="font-normal text-3xl lg:text-5xl text-center lg:text-start"
-            data-aos="flip-left"
-          >
-            Frequently asked questions
-          </h2>
-          <p
-            className="text-zinc-500 text-sm font-normal text-center lg:text-end max-w-[400px]"
-            data-aos="flip-right"
-          >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. A
-            voluptates atque inventore dolorum magni obcaecati, tenetur quidem
-            error ipsa quasi.
-          </p>
+        <section className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {agentsData.map((agent) => (
+            <AgentCard key={agent.id} {...agent} />
+          ))}
         </section>
 
         <section className="flex flex-col gap-3">
-          {faqs.slice(0, 5).map((faq, index) => (
+          {agentsFaq.map((faq, index) => (
             <main
               key={index}
               className="flex flex-col border border-zinc-300 rounded-2xl overflow-hidden p-3 md:p-4"
@@ -57,6 +64,7 @@ export default function Faq() {
           ))}
         </section>
       </section>
+      <OurAgents />
     </>
   );
 }

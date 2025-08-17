@@ -9,7 +9,7 @@ import agent8 from "../assets/images/agents/agent8.jpg";
 
 export { agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8 };
 
-export const Agents = [
+export const agentsData = [
   {
     id: "008801",
     name: "Chinedu Okafor",

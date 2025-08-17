@@ -41,7 +41,7 @@ export default function Footer() {
                 <h3 className="font-semibold text-sm uppercase">
                   Buy, rent and sell
                 </h3>
-                <div className="flex flex-col gap-2 text-zinc-500 text-xs font-normal">
+                <div className="flex flex-col gap-2 text-zinc-500 text-sm font-normal">
                   <Link to={"/"}>Buy and sell properties</Link>
                   <Link to={"/"}>Rent home</Link>
                   <Link to={"/"}>Builder trade-up</Link>
@@ -50,7 +50,7 @@ export default function Footer() {
 
               <main className="flex flex-col gap-3">
                 <h3 className="font-semibold text-sm uppercase">Sell a home</h3>
-                <div className="flex flex-col gap-2 text-zinc-500 text-xs font-normal">
+                <div className="flex flex-col gap-2 text-zinc-500 text-sm font-normal">
                   <Link to={"/"}>Request an offer</Link>
                   <Link to={"/"}>Pricing</Link>
                   <Link to={"/"}>Reviews</Link>
@@ -60,7 +60,7 @@ export default function Footer() {
 
               <main className="flex flex-col gap-3">
                 <h3 className="font-semibold text-sm uppercase">Resources</h3>
-                <div className="flex flex-col gap-2 text-zinc-500 text-xs font-normal">
+                <div className="flex flex-col gap-2 text-zinc-500 text-sm font-normal">
                   <Link to={"/"}>Home</Link>
                   <Link to={"/"}>About</Link>
                   <Link to={"/"}>Properties</Link>

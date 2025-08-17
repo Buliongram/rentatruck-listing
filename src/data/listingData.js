@@ -19,6 +19,15 @@ import {
   listing18,
 } from "../assets/images/listing/listingImages";
 
+import category1 from "../assets/images/categories/category1.png";
+import category2 from "../assets/images/categories/category2.png";
+import category3 from "../assets/images/categories/category3.png";
+import category4 from "../assets/images/categories/category4.png";
+import category5 from "../assets/images/categories/category5.png";
+import category6 from "../assets/images/categories/category6.png";
+import category7 from "../assets/images/categories/category7.png";
+import category8 from "../assets/images/categories/category8.png";
+
 export const listings = [
   {
     id: "08110",
@@ -110,4 +119,15 @@ export const listings = [
     bedroom: 5,
     squareMeters: "17 × 20 m²",
   },
+];
+
+export const categories = [
+  { id: "cat0001", name: "Residential", image: category1 },
+  { id: "cat0002", name: "Apartment", image: category2 },
+  { id: "cat0003", name: "Vacation & Resort", image: category3 },
+  { id: "cat0004", name: "The Land", image: category4 },
+  { id: "cat0005", name: "New Construction", image: category5 },
+  { id: "cat0006", name: "Luxury Estate", image: category6 },
+  { id: "cat0007", name: "Eco-Friendly", image: category7 },
+  { id: "cat0008", name: "Commercial", image: category8 },
 ];
