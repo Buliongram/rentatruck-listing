@@ -20,7 +20,7 @@ export default function Header() {
             <p>Sell</p>
             <div className="flex items-center gap-2">
               <p>Manage Property</p>
-              <FaChevronDown className="text-xs mb-1" />
+              <FaChevronDown className="text-xs " />
             </div>
           </main>
           <main className="flex items-center gap-5 text-black">
@@ -36,7 +36,7 @@ export default function Header() {
               href=""
               className="bg-white rounded-full px-6 py-1.5 flex items-center justify-center text-sm font-medium "
             >
-              <p className="mt-1">Get Started</p>
+              <p className="">Get Started</p>
             </a>
           </main>
         </section>
