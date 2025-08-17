@@ -6,8 +6,9 @@ import Featured from "../includes/Featured";
 import Agents from "../includes/Agents";
 import Blog from "../includes/Blog";
 import Newsletter from "../includes/Newsletter";
-import Testimonials from "../includes/Testimonials";
 import Stats from "../includes/Stats";
+import Agents1 from "../includes/Agents1";
+import Reviews from "../includes/Reviews";
 
 export default function Homepage() {
   return (
@@ -17,8 +18,9 @@ export default function Homepage() {
       <WhyChoose />
       <Featured />
       <Stats />
-      <Agents />
-      <Testimonials />
+      {/* <Agents /> */}
+      <Agents1 />
+      <Reviews />
       <Blog />
       <Newsletter />
     </>

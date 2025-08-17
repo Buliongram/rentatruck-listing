@@ -10,7 +10,7 @@ import { IoMenu } from "react-icons/io5";
 export default function Header() {
   return (
     <>
-      <header className="flex items-center justify-between px-6 lg:px-12 py-3 lg:py-6 fixed w-full top-0 left-0 z-10 text-white bg-gradient-to-b lg:from-[#01495c]  max-[640px]:bg-[#01495c]">
+      <header className="flex items-center justify-between px-6 lg:px-12 py-3 fixed w-full top-0 left-0 z-10 text-white bg-[#013a71]">
         <h1 className="font-black text-2xl lg:text-3xl">RealStay</h1>
 
         <section className="hidden lg:flex items-center gap-10 ">
@@ -41,7 +41,7 @@ export default function Header() {
           </main>
         </section>
 
-        <span className="h-9 w-9 rounded-full shrink-0 bg-white text-[#01495c] flex lg:hidden items-center justify-center cursor-pointer ">
+        <span className="h-9 w-9 rounded-full shrink-0 bg-white text-[#013a71] flex lg:hidden items-center justify-center cursor-pointer ">
           <IoMenu className="text-xl" />
         </span>
       </header>

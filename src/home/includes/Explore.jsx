@@ -5,6 +5,7 @@ import { LuBed, LuSquareM } from "react-icons/lu";
 import { GiBathtub } from "react-icons/gi";
 import { GoLocation } from "react-icons/go";
 import { FaChevronRight } from "react-icons/fa6";
+import ListingSlide from "../components/ListingSlide";
 
 export default function Explore() {
   const arrays = [1, 2, 3, 4, 5, 6];
@@ -53,8 +54,9 @@ export default function Explore() {
         </main>
       </section>
 
-      <article className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {arrays.map((item, index) => (
+     
+        <ListingSlide />
+        {/* {arrays.map((item, index) => (
           <section
             className="flex flex-col rounded-2xl overflow-hidden bg-white group"
             data-aos={`flip-${index % 2 == 0 ? "right" : "left"}`}
@@ -110,8 +112,8 @@ export default function Explore() {
               </main>
             </section>
           </section>
-        ))}
-      </article>
+        ))} */}
+     
 
       <button className="button-primary w-max mx-auto" data-aos="flip-left">
         <span className=""> See More Properties</span>

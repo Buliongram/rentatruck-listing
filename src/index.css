@@ -35,13 +35,13 @@ html {
   font-family: "Nexa" !important;
 }
 .bg-primary {
-  background-color: #01495c !important;
+  background-color: #013a71 !important;
 }
 .text-primary {
-  color: #01495c !important;
+  color: #013a71 !important;
 }
 .border-primary {
-  border-color: #01495c !important;
+  border-color: #013a71 !important;
 }
 .button-primary {
   text-align: center;
@@ -53,6 +53,6 @@ html {
   color: #ffffff;
   padding: 10px 24px;
   border-radius: 0.2rem;
-  background-color: #01495c;
+  background-color: #013a71;
   font-size: 14px;
 }

@@ -9,10 +9,10 @@ import { GrMapLocation } from "react-icons/gr";
 
 export default function Hero() {
   return (
-    <section className="lg:h-[130dvh] relative bg-black flex items-center flex-col lg:flex-row justify-center lg:p-20 gap-16 lg:gap-28 p-8 py-28">
+    <section className="lg:h-[130dvh] relative flex items-center flex-col lg:flex-row justify-center lg:p-20 gap-16 lg:gap-28 p-8 py-28">
       <img
-        src={banner1}
-        className="absolute top-0 left-0 w-full h-full object-cover opacity-60"
+        src={banner}
+        className="absolute top-0 left-0 w-full h-full object-cover"
         alt="banner"
       />
       <main className="flex flex-col gap-6 w-full relative text-white">
@@ -55,7 +55,8 @@ export default function Hero() {
           <p className="">Contact us now</p>
         </a>
       </main>
-      <main
+      <main className="w-full lg:max-w-[400px]"></main>
+      {/* <main
         className="flex flex-col gap-6 w-full relative bg-white rounded-4xl h-full p-10 lg:max-w-[400px] max-h-[450px] items-center text-center justify-between"
         data-aos="flip-right"
       >
@@ -114,7 +115,7 @@ export default function Hero() {
             Search Property <AiOutlineSearch className="text-lg" />
           </button>
         </form>
-      </main>
+      </main> */}
     </section>
   );
 }

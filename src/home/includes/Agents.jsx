@@ -104,7 +104,7 @@ export default function Agents() {
                 </span>
               </div>
             </main>
-            <main className="p-4 rounded-2xl flex flex-col justify-between bg-white w-full max-w-[300px] gap-4">
+            <main className="p-4 rounded-2xl flex flex-col justify-between bg-white w-full lg:max-w-[300px] gap-4">
               <span className=" text-xs px-5 py-1 rounded-full border border-primary text-primary w-max">
                 Contact info
               </span>
