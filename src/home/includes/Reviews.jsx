@@ -1,22 +1,58 @@
 import React from "react";
-import { FaRegStar, FaStar } from "react-icons/fa6";
+import {
+  FaArrowRight,
+  FaArrowUpRightDots,
+  FaRegStar,
+  FaStar,
+} from "react-icons/fa6";
 import { reviews } from "../../data/reviews";
 import { RiPoliceBadgeFill } from "react-icons/ri";
 import { listing10 } from "../../assets/images/listing/listingImages";
+import { banner, banner1 } from "../../assets/images/images";
+import { Link } from "react-router-dom";
 
 export default function Reviews() {
   return (
     <section className=" p-8 py-12 lg:p-28 lg:py-14 flex flex-col items-center gap-10">
-      <section className="flex flex-col gap-2 items-center">
-        <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1">
-          <FaStar />
-          <p className=" uppercase" data-aos="flip-up">
-            Review
-          </p>
-        </span>
-        <h2 className="font-normal text-3xl lg:text-5xl" data-aos="flip-left">
-          What our clients say
-        </h2>
+      <section className="flex flex-col lg:flex-row justify-between w-full items-center gap-6">
+        <section className="flex flex-col items-center lg:items-start gap-2 max-w-[600px]">
+          <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1 w-max">
+            <FaStar />
+            <p className=" uppercase" data-aos="flip-up">
+              Review
+            </p>
+          </span>
+          <h2 className="font-normal text-3xl lg:text-5xl text-center lg:text-start" data-aos="flip-left">
+            What our clients say about us
+          </h2>
+        </section>
+        <section className="flex items-center gap-2">
+          <Link className="flex items-center">
+            {reviews.slice(0, 5).map((review, index) => (
+              <span
+                key={review.id}
+                className={`h-10 w-10 rounded-full overflow-hidden border-2 border-white ${
+                  index !== 0 ? "-ml-3" : ""
+                }`}
+              >
+                <img
+                  src={banner1}
+                  alt="banner"
+                  className="h-full w-full rounded-full object-cover"
+                />
+              </span>
+            ))}
+            <span className="h-10 w-10 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center -ml-3 border-2 border-white">
+              <FaArrowUpRightDots />
+            </span>
+          </Link>
+
+          <span className="font-medium text-sm lg:text-[16px] leading-tight">
+            More than <span className="text-primary font-medium">500+</span>
+            <br />
+            Client Reviews
+          </span>
+        </section>
       </section>
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">

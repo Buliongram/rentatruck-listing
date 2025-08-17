@@ -7,6 +7,8 @@ import agent6 from "../assets/images/agents/agent6.jpg";
 import agent7 from "../assets/images/agents/agent7.jpg";
 import agent8 from "../assets/images/agents/agent8.jpg";
 
+export { agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8 };
+
 export const Agents = [
   {
     id: "008801",

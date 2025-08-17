@@ -6,12 +6,17 @@ import {
   AiOutlineUser,
 } from "react-icons/ai";
 import { IoMenu } from "react-icons/io5";
-
+import { HiOutlineHomeModern } from "react-icons/hi2";
 export default function Header() {
   return (
     <>
       <header className="flex items-center justify-between px-6 lg:px-12 py-3 fixed w-full top-0 left-0 z-10 text-white bg-[#013a71]">
-        <h1 className="font-black text-2xl lg:text-3xl">RealStay</h1>
+        <div className="flex items-center gap-2">
+          <span className="h-8 w-8 rounded-lg bg-white text-primary flex items-center justify-center">
+            <HiOutlineHomeModern />
+          </span>
+          <span className="text-xl font-semibold">RentaHome</span>
+        </div>
 
         <section className="hidden lg:flex items-center gap-10 ">
           <main className="flex items-center gap-6 text-sm font-medium">

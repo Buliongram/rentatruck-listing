@@ -9,6 +9,7 @@ import Newsletter from "../includes/Newsletter";
 import Stats from "../includes/Stats";
 import Agents1 from "../includes/Agents1";
 import Reviews from "../includes/Reviews";
+import Faq from "../includes/Faq";
 
 export default function Homepage() {
   return (
@@ -22,6 +23,7 @@ export default function Homepage() {
       <Agents1 />
       <Reviews />
       <Blog />
+      <Faq />
       <Newsletter />
     </>
   );
