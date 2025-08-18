@@ -6,7 +6,7 @@ import BlogCard from "../../components/BlogCard";
 export default function Blogs() {
   return (
     <>
-      <section className="flex flex-col gap-10 py-28 lg:p-28 lg:pb-0">
+      <section className="flex flex-col gap-10 p-8  py-28 lg:p-28 lg:pb-0">
         <section className="flex flex-col items-center gap-2 w-full">
           <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1 w-max">
             <LuNewspaper />
