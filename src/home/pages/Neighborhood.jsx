@@ -10,6 +10,9 @@ import {
 import { MdOutlineLocationCity } from "react-icons/md";
 import { neighborhoodFaqs } from "../../data/faq";
 import { BiChevronRight } from "react-icons/bi";
+import { Link } from "react-router-dom";
+import { locationData } from "../../data/locationData";
+import { listings } from "../../data/listingData";
 
 export default function Neighborhood() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -41,42 +44,43 @@ export default function Neighborhood() {
           </p>
         </section>
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-          <div className="sm:col-span-2 sm:row-span-2">
-            <img
-              src={banner}
-              alt="Big City"
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
+          {locationData.map((location, index) => {
+            const count = listings.filter(
+              (listing) =>
+                listing.location.replaceAll(" ", "") ===
+                location.name.replaceAll(" ", "")
+            ).length;
 
-          <div>
-            <img
-              src={listing1}
-              alt="Small 1"
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
-          <div>
-            <img
-              src={listing3}
-              alt="Small 2"
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
-          <div>
-            <img
-              src={listing5}
-              alt="Small 3"
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
-          <div>
-            <img
-              src={listing10}
-              alt="Small 4"
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
+            return (
+              <Link
+                to={`/neighborhood/location/${location.name.replaceAll(
+                  " ",
+                  ""
+                )}`}
+                key={location.id}
+                className={`${
+                  index == 0 || index == 6
+                    ? "sm:col-span-2 sm:row-span-2 max-[640px]:h-[300px]"
+                    : "max-[640px]:h-[300px] h-[200px]"
+                } group   cursor-pointer group relative overflow-hidden`}
+              >
+                <img
+                  src={location.image}
+                  alt={location.name}
+                  className="w-full h-full object-cover rounded-2xl absolute top-0 left-0"
+                />
+
+                <span className="absolute top-2 left-3 bg-black text-white flex flex-col px-5 py-2 rounded-xl">
+                  <h3 className="text-sm font-medium">{location.name}</h3>
+                  <p className="text-xs">
+                    {count === 0
+                      ? "No Properties"
+                      : `${count} ${count === 1 ? "Property" : "Properties"}`}
+                  </p>
+                </span>
+              </Link>
+            );
+          })}
         </section>
         <section className="flex flex-col gap-3">
           {neighborhoodFaqs.map((faq, index) => (

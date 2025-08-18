@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function AgentCard({ id, name, title, image }) {
   return (
     <>
-      <Link to={`/agents/${id}`} className="flex flex-col gap-3 group">
+      <Link to={`/agent/single/${id}`} className="flex flex-col gap-3 group">
         <div className="h-[280px] rounded-2xl overflow-hidden">
           <img
             src={image}

@@ -1,7 +1,7 @@
 import React from "react";
 import { MdOutlineLocationCity } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { categories } from "../../data/listingData";
+import { categories, listings } from "../../data/listingData";
 import Newsletter from "../includes/Newsletter";
 
 export default function Categories() {
@@ -24,26 +24,38 @@ export default function Categories() {
         </section>
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-          {categories.map((category, index) => (
-            <Link
-              to={`/listing/category/${category.name
-                .toLowerCase()
-                .replace(" ", "")
-                .replace("& ", "&")
-                .replace("-", "")}`}
-              className="flex flex-col gap-3 p-6 rounded-2xl bg-zinc-100/70"
-            >
-              <span className="h-14 w-14 lg:h-20 lg:w-20 rounded-full bg-white flex items-center justify-center">
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="w-[30px] lg:w-[50px]"
-                />
-              </span>
-              <h3 className="text-lg font-medium">{category.name}</h3>
-              <p className="text-xs text-zinc-500">(1 Property)</p>
-            </Link>
-          ))}
+          {categories.map((category, index) => {
+            const count = listings.filter(
+              (listing) =>
+                listing.category.toLowerCase() === category.name.toLowerCase()
+            ).length;
+
+            return (
+              <Link
+                to={`/listing/categories/${category.name.toLowerCase()}`}
+                className="flex flex-col gap-3 p-6 rounded-2xl bg-zinc-100/70"
+              >
+                <span className="h-14 w-14 lg:h-20 lg:w-20 rounded-full bg-white flex items-center justify-center">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-[30px] lg:w-[50px]"
+                    loading="lazy"
+                  />
+                </span>
+                <h3 className="text-lg font-medium">
+                  {category.name.replaceAll("-", " ")}
+                </h3>
+                <p className="text-xs text-zinc-500">
+                  (
+                  {count === 0
+                    ? "No Properties"
+                    : `${count} ${count === 1 ? "Property" : "Properties"}`}
+                  )
+                </p>
+              </Link>
+            );
+          })}
         </section>
       </section>
       <Newsletter />

@@ -22,7 +22,7 @@ export default function ListingCard({
   return (
     <Link
       to={`/listing/${id}`}
-      className="flex flex-col rounded-2xl overflow-hidden bg-white group"
+      className="flex flex-col rounded-2xl overflow-hidden bg-white lg:border-[1.3px] border-zinc-200 group"
       data-aos={`flip-${Number(id) % 2 == 0 ? "right" : "left"}`}
     >
       <main className="h-[200px] rounded-t-2xl overflow-hidden cursor-pointer">

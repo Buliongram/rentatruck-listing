@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { listings } from "../../data/listingData";
 import { MdOutlineLocationCity } from "react-icons/md";
+import { TbCategoryPlus } from "react-icons/tb";
+
 import {
   IoChevronDown,
   IoGridOutline,
@@ -14,14 +16,14 @@ import ListingCard from "../components/ListingCard";
 import Newsletter from "../includes/Newsletter";
 import NoRecord from "../../components/NoRecord";
 
-export default function City() {
+export default function ListingCategory() {
   const params = useParams();
-  const [location, setLocation] = useState(null);
+  const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const projectDetails = { projectId: params.id };
   useEffect(() => {
-    const fetchSingleProject = async () => {
+    const fetchListingCategory = async () => {
       const url =
         window.location.hostname === "localhost"
           ? "http://localhost:5000/api/project"
@@ -66,41 +68,41 @@ export default function City() {
       }
     };
 
-    const neighborhood = listings.filter(
-      (listing) => listing.location.replaceAll(" ", "") === params.id.toString()
+    const listingCategory = listings.filter(
+      (listing) => listing.category.toLowerCase() === params.id.toString()
     );
 
-    if (neighborhood.length > 0) {
-      setLocation(neighborhood);
+    if (listingCategory.length > 0) {
+      setCategory(listingCategory);
     }
     setLoading(false);
 
-    // fetchSingleProject();
+    // fetchListingCategory();
   }, [params.id]);
 
   return (
     <>
       <section className=" p-8 pt-28 lg:px-28 flex flex-col items-center gap-10">
-        {location ? (
+        {category ? (
           <>
             <section className="flex flex-col items-center gap-2 w-full">
               <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1 w-max">
-                <MdOutlineLocationCity />
+                <TbCategoryPlus />
                 <p className=" uppercase" data-aos="flip-up">
-                  Neighborhood
+                  Category
                 </p>
               </span>
               <h1
-                className="text-3xl lg:text-5xl font-normal text-center max-w-[800px] w-full mx-auto"
+                className="text-3xl lg:text-5xl font-normal text-center max-w-[800px] w-full mx-auto capitalize"
                 data-aos="fade-left"
               >
-                {params.id}
+                {params.id.replaceAll("-", " ")}
               </h1>
             </section>
 
             <section className="flex w-full items-center justify-between">
               <main className="text-sm font-normal">
-                {location?.length} item{location?.length === 1 ? "" : "s"} found
+                {category?.length} item{category?.length === 1 ? "" : "s"} found
               </main>
               <main className="flex items-center gap-3 text-xl">
                 <div className="h-10 w-10 rounded-lg bg-zinc-100 flex items-center justify-center">
@@ -120,7 +122,7 @@ export default function City() {
             </section>
 
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full ">
-              {location.map((product, index) => (
+              {category.map((product, index) => (
                 <ListingCard key={product.id} {...product} />
               ))}
             </section>
@@ -128,7 +130,7 @@ export default function City() {
         ) : (
           <section className="px-4 py-5">
             <h3 className="text-slate-800 text-xl md:text-2xl text-center py-5">
-              {loading ? "Fetching location listings..." : <NoRecord />}
+              {loading ? "Fetching category listings..." : <NoRecord />}
             </h3>
           </section>
         )}

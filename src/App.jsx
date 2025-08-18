@@ -11,7 +11,6 @@ import Reviews from "./home/pages/Reviews";
 import Neighborhood from "./home/pages/Neighborhood";
 import About from "./home/pages/About";
 import Contact from "./home/pages/Contact";
-import Faq from "./home/includes/Faq";
 import Privacy from "./home/pages/Privacy";
 import Terms from "./home/pages/Terms";
 import Blogs from "./home/pages/Blogs";
@@ -24,6 +23,10 @@ import SingleListing from "./home/pages/SingleListing";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import Gallery from "./home/pages/Gallery";
+import ListingCategory from "./home/pages/ListingCategory";
+import Faq from "./home/pages/Faq";
+import AgentDetails from "./home/pages/AgentDetails";
+import Preloader from "./components/Preloader";
 
 export default function App() {
   useEffect(() => {
@@ -33,7 +36,7 @@ export default function App() {
   function PageLayout() {
     return (
       <>
-        <Suspense>
+        <Suspense fallback={<Preloader />}>
           <Header />
           <Outlet />
           <Footer />
@@ -49,21 +52,26 @@ export default function App() {
       children: [
         { path: "/", element: <Homepage /> },
         { path: "/agents", element: <Agents /> },
+        { path: "/agent/single/:id", element: <AgentDetails /> },
         { path: "/reviews", element: <Reviews /> },
         { path: "/about", element: <About /> },
         { path: "/contact", element: <Contact /> },
         { path: "/faq", element: <Faq /> },
         { path: "/privacy-policy", element: <Privacy /> },
-        { path: "/terms-of-service", element: <Terms /> },
+        {
+          path: "/terms-of-service",
+          element: <Terms />,
+        },
         { path: "/blogs", element: <Blogs /> },
         { path: "/blog/:id", element: <SingleBlog /> },
         { path: "/blog/author/:id", element: <BlogAuthor /> },
         { path: "/neighborhood", element: <Neighborhood /> },
-        { path: "/neighborhood/city", element: <City /> },
+        { path: "/neighborhood/location/:id", element: <City /> },
         { path: "/gallery", element: <Gallery /> },
         { path: "/listings", element: <Listings /> },
-        { path: "/listing/categories", element: <Categories /> },
         { path: "/listing/:id", element: <SingleListing /> },
+        { path: "/listing/categories", element: <Categories /> },
+        { path: "/listing/categories/:id", element: <ListingCategory /> },
       ],
     },
     { path: "/login", element: <Login /> },

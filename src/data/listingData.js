@@ -35,14 +35,16 @@ export const listings = [
     title: "Oakview Villa",
     price: 120000000,
     featured: true,
-    address: "Plot 16, Guzape Luxury Estate",
+    address: "Plot 16, Guzape Luxury-Estate",
     state: "Abuja-FCT",
+    location: "Guzape",
     country: "Nigeria",
     description:
       "A modern villa designed with a sleek minimalistic touch. Featuring spacious living areas, large windows for natural light, and a serene environment within a secure estate in Guzape.",
     bathroom: 5,
     bedroom: 4,
     squareMeters: "20 × 24 m²",
+    category: "Luxury-Estate",
   },
   {
     id: "08111",
@@ -52,12 +54,14 @@ export const listings = [
     featured: false,
     address: "Old GRA, Ikoyi",
     state: "Lagos",
+    location: "Ikoyi",
     country: "Nigeria",
     description:
       "A stylish contemporary home located in the heart of Ikoyi. Perfect for modern living with premium finishes, an open-plan kitchen, and elegant bedrooms.",
     bathroom: 5,
     bedroom: 4,
     squareMeters: "18 × 23 m²",
+    category: "Residential",
   },
   {
     id: "08112",
@@ -68,11 +72,13 @@ export const listings = [
     address: "Adjacent Plus Centre, Birnin Kebbi",
     state: "Kebbi",
     country: "Nigeria",
+    location: "Birnin Kebbi",
     description:
       "An elegant home designed for comfort and sophistication. With spacious rooms, private balconies, and modern interiors, this residence redefines classy living in Kebbi.",
     bathroom: 6,
     bedroom: 6,
     squareMeters: "22 × 25 m²",
+    category: "Residential",
   },
   {
     id: "08113",
@@ -82,12 +88,14 @@ export const listings = [
     featured: true,
     address: "26, Maitama Hills Estate",
     state: "Abuja-FCT",
+    location: "Maitama",
     country: "Nigeria",
     description:
       "A premium home situated in Maitama, offering stunning city views, a large living area, modern finishes, and a private garden for relaxation.",
     bathroom: 5,
     bedroom: 5,
     squareMeters: "25 × 26 m²",
+    category: "Luxury-Estate",
   },
   {
     id: "08114",
@@ -97,12 +105,14 @@ export const listings = [
     featured: true,
     address: "Brains & Hammers Estate, Gwarimpa",
     state: "Abuja-FCT",
+    location: "Gwarimpa",
     country: "Nigeria",
     description:
       "A well-crafted duplex that blends elegance with functionality. Located in the popular Gwarimpa district, this home features expansive bedrooms and modern interiors.",
     bathroom: 4,
     bedroom: 5,
     squareMeters: "19 × 21 m²",
+    category: "New-Construction",
   },
   {
     id: "08115",
@@ -113,21 +123,24 @@ export const listings = [
     address: "130, GRA, Benin City",
     state: "Edo",
     country: "Nigeria",
+    location: "GRA Benin City",
     description:
       "A luxury villa in Benin’s exclusive GRA area. Comes with spacious bedrooms, a private garden, and top-class finishing suitable for a family seeking comfort and security.",
     bathroom: 4,
     bedroom: 5,
     squareMeters: "17 × 20 m²",
+    category: "Residential",
   },
 ];
+
 
 export const categories = [
   { id: "cat0001", name: "Residential", image: category1 },
   { id: "cat0002", name: "Apartment", image: category2 },
-  { id: "cat0003", name: "Vacation & Resort", image: category3 },
-  { id: "cat0004", name: "The Land", image: category4 },
-  { id: "cat0005", name: "New Construction", image: category5 },
-  { id: "cat0006", name: "Luxury Estate", image: category6 },
+  { id: "cat0003", name: "Vacation-&-Resort", image: category3 },
+  { id: "cat0004", name: "The-Land", image: category4 },
+  { id: "cat0005", name: "New-Construction", image: category5 },
+  { id: "cat0006", name: "Luxury-Estate", image: category6 },
   { id: "cat0007", name: "Eco-Friendly", image: category7 },
   { id: "cat0008", name: "Commercial", image: category8 },
 ];
