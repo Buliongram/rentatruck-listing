@@ -7,7 +7,7 @@ export default function Preloader() {
         <span className="h-8 w-8 lg:h-12 lg:w-12 rounded-xl text-2xl bg-white text-primary flex items-center justify-center">
           <FaMagento />
         </span>
-        <div className="font-medium text-white loader text-2xl lg:text-4xl"></div>
+        <div className="font-medium text-white loader text-2xl lg:text-3xl tracking-tighter"></div>
       </div>
       {/* <img
         src={}

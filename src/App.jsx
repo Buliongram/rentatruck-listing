@@ -1,8 +1,13 @@
-import React, { Suspense, useEffect } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "./home/components/Header";
 import Footer from "./home/components/Footer";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
 import Homepage from "./home/pages/Homepage";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -27,11 +32,38 @@ import ListingCategory from "./home/pages/ListingCategory";
 import Faq from "./home/pages/Faq";
 import AgentDetails from "./home/pages/AgentDetails";
 import Preloader from "./components/Preloader";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "./assets/store/userSlice";
+import axios from "axios";
+
+const UserDashboard = lazy(() => import("./dashboard/pages/UserDashboard"));
 
 export default function App() {
+  const [loadingUser, setLoadingUser] = useState(true);
+  const dispatch = useDispatch();
   useEffect(() => {
     AOS.init({ duration: 1000, once: false });
-  }, []);
+    const fetchUser = async () => {
+      try {
+        const url =
+          window.location.hostname === "localhost"
+            ? `http://localhost:5000/api/auth/verifyUser`
+            : `https://rentahome-server.onrender.com/api/auth/verifyUser`;
+        const res = await axios.get(url, { withCredentials: true });
+        if (!res.data.error) {
+          dispatch(updateUser(res.data.user));
+        } else {
+          dispatch(updateUser(null));
+        }
+      } catch {
+        dispatch(updateUser(null));
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
 
   function PageLayout() {
     return (
@@ -42,6 +74,25 @@ export default function App() {
           <Footer />
         </Suspense>
       </>
+    );
+  }
+
+  function DashboardLayout() {
+    const activeUser = useSelector((state) => state.user);
+
+    if (loadingUser) {
+      return <Preloader />;
+    }
+
+    if (!activeUser) {
+      return <Navigate to={"/login"} />;
+    }
+
+    return (
+      <Suspense fallback={<Preloader />}>
+        <Header />
+        <Outlet />
+      </Suspense>
     );
   }
 
@@ -76,10 +127,31 @@ export default function App() {
     },
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
+    {
+      path: "/dashboard",
+      element: <DashboardLayout />,
+      children: [{ path: "/dashboard", element: <UserDashboard /> }],
+    },
   ]);
   return (
     <>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          style: {
+            background: "#09090b",
+            color: "#fff",
+            borderRadius: "12px",
+            padding: "10px 16px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            minWidth: "fit-content",
+            maxWidth: "300px",
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+          },
+        }}
+      />
       <RouterProvider router={pageRoutes} />
     </>
   );

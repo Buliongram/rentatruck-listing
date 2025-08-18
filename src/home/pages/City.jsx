@@ -25,7 +25,7 @@ export default function City() {
       const url =
         window.location.hostname === "localhost"
           ? "http://localhost:5000/api/project"
-          : "https://cre8tiveforge-server.onrender.com/api/project";
+          : "https://rentahome-server.onrender.com/api/project";
 
       const cacheKey = `project${params.id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
