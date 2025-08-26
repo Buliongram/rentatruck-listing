@@ -22,7 +22,7 @@ export default function BlogCard({
         <h3 className="text-sm lg:text-lg font-medium">{title}</h3>
 
         <div className="flex items-center gap-2">
-          <Link className="h-10 w-10 rounded-full shrink-0">
+          <Link to={'/'} className="h-10 w-10 rounded-full shrink-0">
             <img
               src={authorImage}
               alt={author}

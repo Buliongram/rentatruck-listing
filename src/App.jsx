@@ -7,6 +7,7 @@ import {
   Navigate,
   Outlet,
   RouterProvider,
+  useNavigate,
 } from "react-router-dom";
 import Homepage from "./home/pages/Homepage";
 import AOS from "aos";
@@ -36,11 +37,46 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./assets/store/userSlice";
 import axios from "axios";
 
-const UserDashboard = lazy(() => import("./dashboard/pages/UserDashboard"));
+const AdminHeader = lazy(() => import("./admin/components/AdminHeader"));
+const AdminStatistics = lazy(() => import("./admin/pages/AdminStatistics"));
+const AdminLeads = lazy(() => import("./admin/pages/AdminLeads"));
+const CreateListing = lazy(() => import("./admin/pages/CreateListing"));
+const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
+const AdminSidebar = lazy(() => import("./admin/components/AdminSidebar"));
+const AdminListings = lazy(() => import("./admin/pages/AdminListings"));
+const AdminUsers = lazy(() => import("./admin/pages/AdminUsers"));
+const AdminAgents = lazy(() => import("./admin/pages/AdminAgents"));
+const AdminOwners = lazy(() => import("./admin/pages/AdminOwners"));
+
+const PanelHeader = lazy(() => import("./panel/components/PanelHeader"));
+const PanelSidebar = lazy(() => import("./panel/components/PanelSidebar"));
+const Settings = lazy(() => import("./panel/user/Settings"));
+const Profile = lazy(() => import("./panel/user/Profile"));
+const DashboadReviews = lazy(() => import("./panel/user/Reviews"));
+const Wishlist = lazy(() => import("./panel/user/Wishlist"));
+const Messages = lazy(() => import("./panel/user/Messages"));
+const Support = lazy(() => import("./panel/user/Support"));
+const UserDashboard = lazy(() => import("./panel/user/UserDashboard"));
 
 export default function App() {
+  const userRoles = [
+    {
+      role: "User",
+      Route: "/dashboard",
+    },
+    {
+      role: "Agent",
+      Route: "/agency",
+    },
+    {
+      role: "Admin",
+      Route: "/admin",
+    },
+  ];
+
   const [loadingUser, setLoadingUser] = useState(true);
   const dispatch = useDispatch();
+  const activeUser = useSelector((state) => state.user);
   useEffect(() => {
     AOS.init({ duration: 1000, once: false });
     const fetchUser = async () => {
@@ -61,7 +97,6 @@ export default function App() {
         setLoadingUser(false);
       }
     };
-
     fetchUser();
   }, [dispatch]);
 
@@ -78,8 +113,6 @@ export default function App() {
   }
 
   function DashboardLayout() {
-    const activeUser = useSelector((state) => state.user);
-
     if (loadingUser) {
       return <Preloader />;
     }
@@ -87,11 +120,46 @@ export default function App() {
     if (!activeUser) {
       return <Navigate to={"/login"} />;
     }
+    const userRole = userRoles.find((r) => r.role === activeUser?.role);
+    if (activeUser && userRole && userRole.Route !== "/dashboard") {
+      return <Navigate to={userRole.Route} />;
+    }
 
     return (
       <Suspense fallback={<Preloader />}>
-        <Header />
-        <Outlet />
+        <PanelSidebar />
+        <section className="lg:ml-[200px] bg-zinc-100/60 relative ">
+          <PanelHeader />
+          <main className="p-6 ">
+            <Outlet />
+          </main>
+        </section>
+      </Suspense>
+    );
+  }
+
+  function AdminLayout() {
+    if (loadingUser) {
+      return <Preloader />;
+    }
+
+    if (!activeUser) {
+      return <Navigate to={"/login"} />;
+    }
+    const userRole = userRoles.find((r) => r.role === activeUser?.role);
+    if (activeUser && userRole && userRole.Route !== "/admin") {
+      return <Navigate to={userRole.Route} />;
+    }
+
+    return (
+      <Suspense fallback={<Preloader />}>
+        {/* <AdminSidebar /> */}
+        <section className=" bg-zinc-100/60 p-4 ">
+          <AdminHeader />
+          <main className="mt-4 ">
+            <Outlet />
+          </main>
+        </section>
       </Suspense>
     );
   }
@@ -130,7 +198,36 @@ export default function App() {
     {
       path: "/dashboard",
       element: <DashboardLayout />,
-      children: [{ path: "/dashboard", element: <UserDashboard /> }],
+      children: [
+        { path: "/dashboard", element: <UserDashboard /> },
+        { path: "/dashboard/messages", element: <Messages /> },
+        { path: "/dashboard/saved-items", element: <Wishlist /> },
+        { path: "/dashboard/reviews", element: <DashboadReviews /> },
+        { path: "/dashboard/support", element: <Support /> },
+        { path: "/dashboard/profile", element: <Profile /> },
+        { path: "/dashboard/security", element: <Settings /> },
+        { path: "/dashboard/listings", element: <AdminListings /> },
+      ],
+    },
+    {
+      path: "/admin",
+      element: <AdminLayout />,
+      children: [
+        { path: "/admin", element: <AdminDashboard /> },
+        { path: "/admin/messages", element: <Messages /> },
+        { path: "/admin/saved-items", element: <Wishlist /> },
+        { path: "/admin/reviews", element: <DashboadReviews /> },
+        { path: "/admin/support", element: <Support /> },
+        { path: "/admin/profile", element: <Profile /> },
+        { path: "/admin/security", element: <Settings /> },
+        { path: "/admin/enquiries", element: <AdminLeads /> },
+        { path: "/admin/statistics", element: <AdminStatistics /> },
+        { path: "/admin/create/listing", element: <CreateListing /> },
+        { path: "/admin/listings", element: <AdminListings /> },
+        { path: "/admin/users", element: <AdminUsers /> },
+        { path: "/admin/agents", element: <AdminAgents /> },
+        { path: "/admin/owners", element: <AdminOwners /> },
+      ],
     },
   ]);
   return (

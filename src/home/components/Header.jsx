@@ -5,7 +5,7 @@ import { HiOutlineHomeModern } from "react-icons/hi2";
 import { Link, useLocation } from "react-router-dom";
 import { FiHome } from "react-icons/fi";
 import { CiLogin } from "react-icons/ci";
-import { BsFolder2Open } from "react-icons/bs";
+import { BsArrowRight, BsFolder2Open } from "react-icons/bs";
 import { IoMdContact } from "react-icons/io";
 import { RiServiceLine, RiShieldKeyholeLine } from "react-icons/ri";
 import {
@@ -123,7 +123,7 @@ export default function Header() {
     ));
   };
   const renderLinks2 = () => {
-    return navLinks.slice(4).map(({ name, path, id, icon }) => (
+    return navLinks.slice(5).map(({ name, path, id, icon }) => (
       <Link
         key={id}
         to={path}
@@ -149,55 +149,59 @@ export default function Header() {
           <span className="h-8 w-8 rounded-lg text-lg bg-white text-primary flex items-center justify-center">
             <FaMagento />
           </span>
-          <div className="text-2xl font-medium text-white">RentaHome</div>
+          <div className="text-xl font-medium text-white">RentaHome</div>
         </Link>
 
-        <section className="hidden lg:flex items-center gap-10 ">
-          <main className="flex items-center gap-6 text-sm font-medium">
-            {navLinks.slice(0, 4).map((link, index) => (
-              <Link
-                key={link.id}
-                to={link.path}
-                className="flex items-center gap-1"
-              >
-                {link.name} {link.icon}
-              </Link>
-            ))}
-            <div
-              className="flex items-center gap-2 relative py-6 cursor-pointer "
-              onMouseEnter={() => Setdropdown(true)}
-              onMouseLeave={() => Setdropdown(false)}
+        <main className="hidden lg:flex items-center gap-6 text-sm font-medium">
+          {navLinks.slice(0, 5).map((link, index) => (
+            <Link
+              key={link.id}
+              to={link.path}
+              className="flex items-center gap-1"
             >
-              <p>Pages</p>
-              <FaChevronDown className="text-xs " />
+              {link.name}
+            </Link>
+          ))}
+          <div
+            className="flex items-center gap-2 relative py-6 cursor-pointer "
+            onMouseEnter={() => Setdropdown(true)}
+            onMouseLeave={() => Setdropdown(false)}
+          >
+            <p>Pages</p>
+            <FaChevronDown className="text-xs " />
 
-              <section
-                className={`absolute ${
-                  dropdown ? "maxheightfull" : "maxheight0"
-                } bg-primary transition-all backdrop-blur-md w-max top-full rounded-b-2xl overflow-hidden right-0 z-[5] `}
-              >
-                <main className="flex flex-col w-full p-4 gap-1">
-                  {/* <div className="flex flex-col w-full gap-2 md:hidden">
-                    {renderLinks2()}
-                    <span
-                      onClick={() => setShowContact(!showContact)}
-                      className="px-5 py-2.5 rounded-full flex items-center gap-1 cursor-pointer"
-                    >
-                      <p>Contact</p> <IoMdContact />
-                    </span>
-                  </div> */}
-                  {renderLinks2()}
-                  <Link
-                    to={"/login"}
-                    className="px-5 py-2.5 rounded-full bg-white text-primary flex text-xs items-center gap-1 justify-center"
-                  >
-                    Login
-                    <CiLogin />
-                  </Link>
-                </main>
-              </section>
-            </div>
-          </main>
+            <section
+              className={`absolute ${
+                dropdown ? "maxheightfull" : "maxheight0"
+              } bg-primary transition-all backdrop-blur-md w-max top-full rounded-b-2xl overflow-hidden right-0 z-[5] `}
+            >
+              <main className="flex flex-col w-full p-4 gap-1">
+                {renderLinks2()}
+                <Link
+                  to={"/login"}
+                  className="px-5 py-2.5 rounded-full bg-white text-primary flex text-xs items-center gap-1 justify-center"
+                >
+                  Login
+                  <CiLogin />
+                </Link>
+              </main>
+            </section>
+          </div>
+        </main>
+
+        <section className="hidden lg:flex items-center gap-3 text-sm">
+          <Link to={"/login"}>Log in</Link>
+          <Link
+            to={"/register"}
+            className="flex items-center gap-2 bg-white text-primary p-1 rounded-full pl-4"
+          >
+            Sign up{" "}
+            <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center">
+              <BsArrowRight />
+            </span>
+          </Link>
+        </section>
+        {/* <section className="hidden lg:flex items-center gap-10 ">
           <main className="flex items-center gap-5 text-black">
             <div className="flex items-center gap-1">
               <span className="h-9 w-9 rounded-full shrink-0 bg-white flex items-center justify-center cursor-pointer">
@@ -217,7 +221,7 @@ export default function Header() {
               <p className="">Get Started</p>
             </Link>
           </main>
-        </section>
+        </section> */}
 
         <span
           onClick={() => Setdropdown(!dropdown)}

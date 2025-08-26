@@ -12,7 +12,7 @@ import { auth, provider } from "../library/firebase";
 export default function Register() {
   const [disableBtn, setDisableBtn] = useState(false);
   const [googleLoader, setgoogleLoader] = useState(false);
-  const [userType, setUserType] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [toggleSignupCont, setToggleSignupCont] = useState(false);
   const [phone, setPhone] = useState("");
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function Register() {
     email: "",
     password: "",
     phoneNumber: phone,
-    type: "",
+    role: "",
   });
 
   const handleChange = (e) => {
@@ -34,28 +34,28 @@ export default function Register() {
   const userCategory = [
     {
       id: "0001",
-      type: "User",
+      role: "User",
       description: "I want to access features for a User",
       name: "Register as a Buyer or Renter",
     },
 
     {
       id: "0002",
-      type: "Individual Agent",
+      role: "Individual Agent",
       description: "I want to access features for an Individual Agent",
       name: "Register as an Agent",
     },
 
     {
       id: "0003",
-      type: "Property Agency",
+      role: "Property Agency",
       description: "I want to access features for a Property Agency",
       name: "Register as an Agency",
     },
 
     {
       id: "0004",
-      type: "Property Owner",
+      role: "Property Owner",
       description: "I want to access features for a Property Owner",
       name: "Register as a Property Owner",
     },
@@ -63,8 +63,8 @@ export default function Register() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (signupInputs.type === "" || signupInputs.phoneNumber === "") {
-      toast.error("Please select a user type and enter phone number", {
+    if (signupInputs.role === "" || signupInputs.phoneNumber === "") {
+      toast.error("Please select a user role and enter phone number", {
         id: "123",
       });
       return;
@@ -131,7 +131,7 @@ export default function Register() {
         setgoogleLoader(false);
         const res = await axios.post(
           url,
-          { email: user.email, firstname: user.displayName, type: userType },
+          { email: user.email, firstname: user.displayName, role: userRole },
           { withCredentials: true }
         );
 
@@ -186,7 +186,7 @@ export default function Register() {
                   How do you want to Sign Up As?
                 </h1>
                 <p className="text-sm font-medium text-zinc-500">
-                  Select User Type
+                  Select User role
                 </p>
               </div>
 
@@ -196,10 +196,10 @@ export default function Register() {
                     key={category.id}
                     onClick={() => {
                       setToggleSignupCont(true);
-                      setUserType(category.type);
+                      setUserRole(category.role === "User" ? "User" : "Agent");
                       setSignupInputs((prev) => ({
                         ...prev,
-                        type: category.type,
+                        role: category.role === "User" ? "User" : "Agent",
                       }));
                     }}
                     className="p-3 rounded-xl border border-zinc-200 flex items-center justify-between cursor-pointer"
@@ -226,11 +226,11 @@ export default function Register() {
                 <p
                   onClick={() => {
                     setToggleSignupCont(false);
-                    setUserType("");
+                    setUserRole("");
                   }}
                   className="text-[13px] text-zinc-500 font-medium flex items-center gap-1 mx-auto cursor-pointer"
                 >
-                  Not {userType === "Individual Agent" ? "an" : "a"} {userType}?
+                  Not {userRole === "Individual Agent" ? "an" : "a"} {userRole}?
                   <span className="font-medium text-primary text-sm">
                     Sign Up As
                   </span>

@@ -7,6 +7,8 @@ import noresult from "./vectors/noresult.png";
 import google from "./vectors/google.png";
 import facebook from "./vectors/facebook.png";
 import twitter from "./vectors/twitter.png";
+import shield from "./vectors/shield.png";
+import wishlist from "./vectors/wishlist.gif";
 
 export {
   banner,
@@ -18,4 +20,6 @@ export {
   facebook,
   google,
   twitter,
+  shield,
+  wishlist,
 };

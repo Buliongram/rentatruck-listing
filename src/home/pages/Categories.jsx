@@ -1,7 +1,7 @@
 import React from "react";
 import { MdOutlineLocationCity } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { categories, listings } from "../../data/listingData";
+import { listingCategory, listings } from "../../data/listingData";
 import Newsletter from "../includes/Newsletter";
 
 export default function Categories() {
@@ -24,7 +24,7 @@ export default function Categories() {
         </section>
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-          {categories.map((category, index) => {
+          {listingCategory.map((category, index) => {
             const count = listings.filter(
               (listing) =>
                 listing.category.toLowerCase() === category.name.toLowerCase()

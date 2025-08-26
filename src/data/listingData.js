@@ -134,7 +134,7 @@ export const listings = [
 ];
 
 
-export const categories = [
+export const listingCategory = [
   { id: "cat0001", name: "Residential", image: category1 },
   { id: "cat0002", name: "Apartment", image: category2 },
   { id: "cat0003", name: "Vacation-&-Resort", image: category3 },

@@ -2,267 +2,589 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { listings } from "../../data/listingData";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import {
-  IoCheckmarkCircleOutline,
-  IoHeartOutline,
-  IoShareOutline,
+  IoEyeOutline,
+  IoHeart,
+  IoLocationOutline,
+  IoStarOutline,
 } from "react-icons/io5";
-import Newsletter from "../includes/Newsletter";
 import NoRecord from "../../components/NoRecord";
-import { CiShop } from "react-icons/ci";
-import { LuBath, LuBed, LuPaintbrushVertical } from "react-icons/lu";
-import { BiArea } from "react-icons/bi";
+import { LuBed, LuChevronLeft, LuChevronRight, LuToilet } from "react-icons/lu";
+import {
+  BiArea,
+  BiPhoneCall,
+  BiShower,
+  BiSolidBadgeCheck,
+} from "react-icons/bi";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaComment,
+  FaEllipsisH,
+  FaFacebook,
+  FaInstagram,
+  FaRegStar,
+  FaStar,
+  FaWhatsapp,
+} from "react-icons/fa";
+import { FaArrowLeftLong, FaLinkedinIn } from "react-icons/fa6";
+import { TbMeterSquare } from "react-icons/tb";
+import { useSelector } from "react-redux";
+import { noresult, shield } from "../../assets/images/images";
+import Loader from "../../components/Loader";
 
 export default function SingleListing() {
-  const position = [9.0579, 7.4951];
+  const API_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000/api"
+      : "https://rentahome-server.onrender.com/api";
+  const user = useSelector((state) => state.user);
   const params = useParams();
-  const [listing, setListing] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const projectDetails = { projectId: params.id };
+
+  const [listing, setListing] = useState(null);
+  const [agent, setAgent] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isFavouriting, setIsFavouriting] = useState(false);
+  const [isEnquiring, setIsEnquiring] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const [enquiryInput, setEnquiryInput] = useState({
+    name: "",
+    email: "",
+    number: "",
+    message: "",
+  });
+
   useEffect(() => {
-    const fetchListings = async () => {
-      const url =
-        window.location.hostname === "localhost"
-          ? "http://localhost:5000/api/project"
-          : "https://rentahome-server.onrender.com/api/project";
-
-      const cacheKey = `project${params.id}`;
-      const cached = JSON.parse(localStorage.getItem(cacheKey));
-
+    const fetchListing = async () => {
       setLoading(true);
-
       try {
-        const {
-          data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated/${params.id}`);
-
-        if (cached && cached.lastUpdated === lastUpdated) {
-          setProject(cached.foundData);
-          setLoading(false);
-          return;
-        }
-        const res = await axios.post(`${url}/find`, projectDetails, {
-          withCredentials: true,
-        });
-        const data = res.data;
-
-        if (data.error) {
-          toast.error(data.message, { id: "123" });
-          setTimeout(() => navigate("/projects"), 1000);
-        } else {
-          const foundData = data.findProject;
-          setProject(foundData);
-          localStorage.setItem(
-            cacheKey,
-            JSON.stringify({ foundData, lastUpdated })
-          );
-          setLoading(false);
-        }
+        const { data } = await axios.get(
+          `${API_URL}/listing/fetch/${params.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        setListing(data.listing);
+        setAgent(data.agent);
+        setReviews(data.reviews);
+        setEnquiryInput((prev) => ({
+          ...prev,
+          message: `Hello ${data.agent.firstname} ${
+            data.agent.lastname
+          }, I'd like to check the availability for ${data.listing.title}, ${
+            data.listing.location.state
+          }, ₦${data.listing.price.toLocaleString()}. Thank you!`,
+        }));
       } catch (err) {
-        console.error("Error fetching project:", err);
-        toast.error("An unknown error occurred", { id: "123" });
-        setTimeout(() => navigate("/projects"), 1000);
+        console.error("Error fetching listing:", err);
+        toast.error("An unknown error occurred", { id: "fetch_error" });
+        setTimeout(() => navigate("/listings"), 1000);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const listingData = listings.find((el) => el.id === params.id.toString());
-    if (listingData) setListing((prev) => ({ ...listingData }));
-    setLoading(false);
+    fetchListing();
+  }, [params.id, navigate]);
 
-    // fetchListings();
-  }, [params.id]);
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? listing.images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === listing.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handleAddToFavourite = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please log in to continue", { id: "auth_error" });
+      return;
+    }
+    setIsFavouriting(true);
+    const toastId = toast.loading("Adding listing to favourites...");
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/listing/favorites/add`,
+        { listingId: listing._id },
+        { withCredentials: true }
+      );
+      if (res.data.error) {
+        toast.error(res.data.message, { id: toastId });
+      } else {
+        toast.success(res.data.message, { id: toastId });
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Unable to add listing to favourites.";
+      toast.error(errorMessage, { id: toastId });
+    } finally {
+      setIsFavouriting(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setEnquiryInput((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleEnquiries = async (e) => {
+    e.preventDefault();
+    setIsEnquiring(true);
+    const toastId = toast.loading("Processing your request...");
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/enquiry/store`,
+        { ...enquiryInput, listingId: listing?._id },
+        {
+          withCredentials: true,
+        }
+      );
+      if (res.data.error) {
+        toast.error(res.data.message, { id: toastId });
+      } else {
+        toast.success(res.data.message, { id: toastId });
+        setEnquiryInput({ name: "", email: "", number: "", message: "" });
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "An unknown error occurred. Please try again.";
+      toast.error(errorMessage, { id: toastId });
+    } finally {
+      setIsEnquiring(false);
+    }
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (!listing) {
+    return <NoRecord />;
+  }
+
+  const mapPosition = [6.5244, 3.3792];
 
   return (
-    <>
-      <section className=" p-8 pt-28 lg:px-28 flex flex-col items-center gap-10">
-        {listing ? (
-          <>
-            <section className="flex flex-col lg:flex-row w-full items-center lg:items-end justify-between gap-4">
-              <section className="flex flex-col items-center lg:items-start gap-1 w-full lg:gap-2">
-                <span className="border rounded-full border-zinc-300 p-0.5 lg:py-1 px-5 text-[10px] lg:text-xs text-primary flex items-center gap-1 w-max">
-                  <CiShop />
-                  <p className=" uppercase" data-aos="flip-up">
-                    Single listing
-                  </p>
-                </span>
-                <h1
-                  className="text-3xl lg:text-5xl font-normal text-center lg:text-left w-full mx-auto capitalize"
-                  data-aos="fade-left"
-                >
-                  {listing?.title}
-                </h1>
-                <p className="text-sm font-normal text-center lg:text-left text-zinc-500 max-w-[500px]">
-                  {listing?.address}
-                </p>
+    <article className="flex flex-col gap-4 p-6 py-24 ">
+      <section className="flex flex-col rounded-2xl border border-zinc-200 p-4">
+        <main className="flex items-center gap-1 text-xs text-zinc-500 font-normal">
+          <FaArrowLeftLong /> Back to property list
+        </main>
+        <h3 className="text-2xl font-semibold">Property Details</h3>
+      </section>
+      <section className="flex gap-4">
+        <article className="w-full flex flex-col rounded-2xl overflow-hidden border border-zinc-200">
+          <section className="h-[380px] rounded-t-2xl relative w-full">
+            <div className="absolute top-3 left-3 bg-orange-600 text-white rounded-lg text-[10px] font-semibold px-3 py-1">
+              {listing.category || "House"}
+            </div>
+            <div className="absolute top-3 right-3 bg-white rounded-lg text-xs font-semibold px-3 py-1">
+              {listing.purpose || "For Sale"}
+            </div>
+            <div className="absolute bottom-4 right-3 flex items-center gap-1 text-xs">
+              <span
+                onClick={handlePrevImage}
+                className="h-8 w-8 rounded-full flex items-center justify-center bg-white/50 backdrop-blur-lg cursor-pointer"
+              >
+                <FaChevronLeft />
+              </span>
+              <span
+                onClick={handleNextImage}
+                className="h-8 w-8 rounded-full flex items-center justify-center bg-white cursor-pointer"
+              >
+                <FaChevronRight />
+              </span>
+            </div>
+            <img
+              src={listing.images[currentImageIndex].url}
+              className="h-full w-full rounded-t-2xl object-cover"
+              alt={listing.title}
+            />
+          </section>
+          <section className="p-6 flex flex-col gap-4">
+            <article className="flex flex-col">
+              <section className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">{listing.title}</h3>
+                <h3 className="text-xl text-primary font-semibold">
+                  &#8358;{listing.price.toLocaleString()}
+                </h3>
               </section>
-              <main className="flex items-center gap-2 text-[13px]">
-                <div className=" rounded-lg bg-zinc-100 flex items-center justify-center gap-1 px-4 py-2">
-                  <IoShareOutline /> Share
+              <section className="flex items-center justify-between text-xs text-zinc-500 font-normal">
+                <div className="flex items-center">
+                  <IoLocationOutline />
+                  {listing.location.street}
                 </div>
-
-                <div className=" rounded-lg bg-zinc-100 flex items-center justify-center gap-1 px-4 py-2">
-                  <IoHeartOutline /> Favourite
+                <section className="flex items-center gap-3">
+                  <main className="flex items-center gap-1">
+                    <IoStarOutline /> 4.8
+                  </main>
+                  <main className="flex items-center gap-1">
+                    <IoEyeOutline /> {listing.views}
+                  </main>
+                </section>
+              </section>
+            </article>
+            <article className="text-xs text-zinc-500 font-normal leading-tight">
+              {listing.description || "No description provided."}
+            </article>
+            <article className="flex items-center gap-1 text-[11px]">
+              <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
+                <LuBed />
+                {listing.bedrooms} Bedrooms
+              </span>
+              <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
+                <BiShower />
+                {listing.bathrooms} Bathrooms
+              </span>
+              <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
+                <LuToilet />
+                {listing.toilets} Toilets
+              </span>
+              <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
+                <BiArea />
+                {listing.areaSize}
+                <TbMeterSquare className="-ml-1" />
+              </span>
+            </article>
+            <article className="flex flex-col gap-4 mt-6">
+              <main className="flex items-center justify-between">
+                <div className="text-sm font-semibold">Property Reviews</div>
+                <div className="flex items-center gap-1 text-xs">
+                  <span className="h-8 w-8 rounded-full flex items-center justify-center bg-zinc-100 backdrop-blur-lg cursor-pointer">
+                    <LuChevronLeft />
+                  </span>
+                  <span className="h-8 w-8 rounded-full flex items-center justify-center bg-zinc-100 cursor-pointer">
+                    <LuChevronRight />
+                  </span>
                 </div>
               </main>
-            </section>
-
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-              <div className="rounded-lg overflow-hidden group sm:col-span-2 sm:row-span-2">
-                <img
-                  src={listing?.image[0]}
-                  loading="lazy"
-                  alt={listing?.name}
-                  className="h-full w-full rounded-lg object-cover"
-                />
-              </div>
-              <div className="rounded-lg overflow-hidden group ">
-                <img
-                  src={listing?.image[1]}
-                  loading="lazy"
-                  alt={listing?.name}
-                  className="h-full w-full rounded-lg object-cover"
-                />
-              </div>
-              <div className="rounded-lg overflow-hidden group ">
-                <img
-                  src={listing?.image[2]}
-                  loading="lazy"
-                  alt={listing?.name}
-                  className="h-full w-full rounded-lg object-cover"
-                />
-              </div>
-            </section>
-
-            <section className="flex flex-col lg:flex-row gap-4 w-full -mt-5">
-              <section className="w-full flex flex-col gap-4">
-                <main className="p-5 border border-zinc-200 rounded-2xl flex items-center justify-between text-xs">
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-zinc-500 text-xs lg:text-sm">
-                      Bedrooms
-                    </span>
-                    <span className="flex items-center gap-1 font-semibold text-[13px] lg:text-[15px]">
-                      <LuBed /> {listing?.bedroom}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-zinc-500 text-xs lg:text-sm">
-                      Bathrooms
-                    </span>
-                    <span className="flex items-center gap-1 font-semibold text-[13px] lg:text-[15px]">
-                      <LuBath /> {listing?.bathroom}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-zinc-500 text-xs lg:text-sm">
-                      Square Area
-                    </span>
-                    <span className="flex items-center gap-1 font-semibold text-[13px] lg:text-[15px]">
-                      <BiArea /> {listing?.squareMeters}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-zinc-500 text-xs lg:text-sm">
-                      Repair Quality
-                    </span>
-                    <span className="flex items-center gap-1 font-semibold text-[13px] lg:text-[15px]">
-                      <LuPaintbrushVertical /> Moderm Loft
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-zinc-500 text-xs lg:text-sm">
-                      Status
-                    </span>
-                    <span className="flex items-center gap-1 font-semibold text-[13px] lg:text-[15px]">
-                      <IoCheckmarkCircleOutline /> 4
-                    </span>
-                  </div>
-                </main>
-
-                <main className="flex flex-col">
-                  <h3 className="text-lg font-semibold">Description</h3>
-                  <p className="text-sm text-zinc-500 font-normal">
-                    {listing?.description}
+              {reviews.length < 1 ? (
+                <section className="flex flex-col items-center mx-auto gap-2">
+                  <img
+                    src={noresult}
+                    alt="No Reviews yet."
+                    className="w-[150px]"
+                    loading="lazy"
+                  />
+                  <p className="text-lg font-medium font-primary">
+                    No Reviews yet.
                   </p>
-                </main>
-
-                <main className="flex flex-col mt-6">
-                  <h3 className="text-lg font-semibold">Other Information</h3>
-                  <p className="text-sm text-zinc-500 font-normal">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Optio adipisci, nulla doloremque itaque dicta officiis.
-                    Consequuntur incidunt cum eveniet voluptate et nobis
-                    repellendus ut. Recusandae, vel aut neque atque modi ullam
-                    eos ducimus est illum cupiditate veritatis facilis rerum
-                    saepe deleniti distinctio in nostrum asperiores.
-                    Consequuntur amet nam animi magni.
-                  </p>
-                </main>
-
-                {/* <main className="bg-zinc-100/50 p-5 rounded-2xl flex items-end justify-between border border-zinc-200">
-                  <div className="flex flex-col gap-4">
-                    <p className="text-sm text-primary">
-                      Listed by property owner
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="h-10 w-10 rounded-full">
-                        <img
-                          src={banner}
-                          alt=""
-                          className="h-full w-full rounded-full object-cover"
-                        />
-                      </span>
-                      <span className="flex flex-col justify-between text-sm">
-                        <p className="font-semibold">Williams</p>
-                        <p className="text-xs text-zinc-500">
-                          Lorem ipsum dolor sit amet.
-                        </p>
-                      </span>
+                </section>
+              ) : (
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-6">
+                  {reviews.slice(0, 3).map((review, index) => (
+                    <div
+                      key={index}
+                      className="break-inside-avoid rounded-2xl border border-zinc-200/70 p-3 flex flex-col gap-4 bg-white"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-6 w-6 shrink-0 rounded-full bg-zinc-100 relative">
+                          <img
+                            src={review.image}
+                            alt={review.name}
+                            className="h-full w-full rounded-full object-cover"
+                          />
+                        </span>
+                        <section className="flex w-full justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold capitalize">
+                              {review.name}
+                            </span>
+                            <p className="text-[10px] text-primary font-medium">
+                              {review.title}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 text-[10px] text-yellow-500">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i}>
+                                {i < review.rating ? <FaStar /> : <FaRegStar />}
+                              </span>
+                            ))}
+                          </div>
+                        </section>
+                      </div>
+                      <p className="text-xs leading-tight text-zinc-600 font-normal">
+                        {review.message}
+                      </p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="px-6 py-1.5 bg-black text-white">
-                      hello
-                    </span>
-                    <span className="px-6 py-1.5 bg-black text-white">
-                      hello
-                    </span>
-                  </div>
-                </main> */}
-              </section>
-              <section className="w-full max-w-[340px] bg-zinc-100 rounded-2xl h-[300px] overflow-hidden">
+                  ))}
+                </div>
+              )}
+            </article>
+            <article className="flex flex-col gap-4">
+              <div className="text-sm font-semibold">Location</div>
+              <div className="h-[250px] rounded-2xl overflow-hidden">
                 <MapContainer
-                  center={position}
+                  center={mapPosition}
                   zoom={13}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
+                  style={{ height: "100%", width: "100%" }}
                 >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-                  <Marker position={position}>
-                    <Popup>Guzape Luxury Estate</Popup>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <Marker position={mapPosition}>
+                    <Popup>{listing.location.street}</Popup>
                   </Marker>
                 </MapContainer>
+              </div>
+            </article>
+            <article className="flex items-center justify-between bg-zinc-100 px-6 py-3 rounded-xl">
+              <span className="text-sm font-semibold">
+                Like this property? Add as favourites and compare listings
+              </span>
+              <div
+                onClick={handleAddToFavourite}
+                className="flex items-center justify-center gap-1 text-xs text-white bg-primary rounded-xl px-6 py-2.5 cursor-pointer min-w-[150px]"
+              >
+                {isFavouriting ? (
+                  <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block my-1"></span>
+                ) : (
+                  <>
+                    <IoHeart /> Add to favourite
+                  </>
+                )}
+              </div>
+            </article>
+            <article className="flex items-center justify-between w-full">
+              <section className="flex items-center gap-2">
+                <img
+                  src={shield}
+                  className="w-[70px]"
+                  loading="lazy"
+                  alt="verified property"
+                />
+                <main className="flex flex-col">
+                  <span className="text-sm font-semibold">
+                    Property is verified as real
+                  </span>
+                  <span className="text-xs">
+                    If reported as fake, we'll investigate to confirm if this
+                    listing isn't real.
+                  </span>
+                </main>
               </section>
-            </section>
-          </>
-        ) : (
-          <section className="px-4 py-5">
-            <h3 className="text-slate-800 text-xl md:text-2xl text-center py-5">
-              {loading ? "Fetching category listings..." : <NoRecord />}
-            </h3>
+              <div className="flex items-center text-xs text-primary border border-primary rounded-xl px-6 py-2.5">
+                Report property
+              </div>
+            </article>
           </section>
-        )}
+        </article>
+        <article className="w-full max-w-[350px] shrink-0 flex flex-col gap-4">
+          <section className="flex flex-col gap-4 p-5 rounded-2xl border border-zinc-200 bg-white items-center w-full">
+            <main className="flex items-center justify-between text-sm font-semibold w-full">
+              Agent Profile
+              <FaEllipsisH />
+            </main>
+            <main className="flex flex-col items-center gap-2">
+              <span className="h-20 w-20 rounded-full">
+                <img
+                  src={agent.profilePhoto}
+                  className="h-full w-full rounded-full object-cover"
+                  alt={`${agent.firstname} Image`}
+                />
+              </span>
+              <span className="text-[16px] font-semibold">
+                {`${agent.firstname} ${agent.lastname}`}
+              </span>
+            </main>
+            <main className="text-[11px] text-center text-zinc-500 font-normal leading-tight">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
+              sed sapiente numquam exercitationem officia voluptatum aperiam,
+              minima fugit voluptas! Pariatur!
+            </main>
+            <main className="flex items-center justify-between w-full text-sm">
+              <div className="flex items-center gap-1 text-zinc-500">
+                <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <FaFacebook />
+                </span>
+                <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <FaInstagram />
+                </span>
+                <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <FaLinkedinIn />
+                </span>
+              </div>
+              <div className="text-xs text-white bg-primary font-normal flex items-center gap-1 px-6 py-2 rounded-full">
+                <FaComment />
+                Get in Touch
+              </div>
+            </main>
+          </section>
+          <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full">
+            <div className="text-sm font-semibold">Request Enquiry</div>
+            <form onSubmit={handleEnquiries} className="flex flex-col gap-2">
+              <main className="flex gap-2">
+                <label htmlFor="name" className="text-[11px]">
+                  Name
+                </label>
+                <input
+                  name="name"
+                  value={enquiryInput.name}
+                  onChange={handleChange}
+                  required
+                  type="text"
+                  id="name"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  placeholder="Enter full name"
+                />
+              </main>
+              <main className="flex gap-2">
+                <label htmlFor="email" className="text-[11px]">
+                  Email
+                </label>
+                <input
+                  value={enquiryInput.email}
+                  onChange={handleChange}
+                  required
+                  name="email"
+                  type="email"
+                  id="email"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  placeholder="Enter email address"
+                />
+              </main>
+              <main className="flex gap-2">
+                <label htmlFor="number" className="text-[11px]">
+                  Number
+                </label>
+                <input
+                  value={enquiryInput.number}
+                  onChange={handleChange}
+                  required
+                  name="number"
+                  type="text"
+                  id="number"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  placeholder="Enter phone number"
+                />
+              </main>
+              <main className="flex gap-2">
+                <label htmlFor="message" className="text-[11px]">
+                  Message
+                </label>
+                <textarea
+                  onChange={handleChange}
+                  required
+                  name="message"
+                  id="message"
+                  rows={4}
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
+                  placeholder="Enter your message"
+                  value={enquiryInput.message}
+                />
+              </main>
+              <div className="flex items-center justify-between gap-6 mt-4">
+                <button
+                  type="submit"
+                  className="flex items-center gap-1 rounded-xl justify-center w-full bg-primary text-xs text-white px-6 py-2.5 cursor-pointer"
+                >
+                  {isEnquiring ? (
+                    <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block my-1 "></span>
+                  ) : (
+                    <>
+                      <BiPhoneCall /> Enquire
+                    </>
+                  )}
+                </button>
+                <a
+                  href={`https://wa.me/2348012345678?text=Hello ${
+                    agent.firstname
+                  } ${
+                    agent.lastname
+                  }, I would like to check the availability for ${
+                    listing?.title
+                  }, ${
+                    listing?.location.state
+                  }, ₦${listing?.price.toLocaleString()}. Thank you!`}
+                  className="flex items-center justify-center gap-1 rounded-xl w-full bg-green-500 text-xs text-white px-6 py-2.5 cursor-pointer"
+                >
+                  <FaWhatsapp /> WhatsApp
+                </a>
+              </div>
+            </form>
+          </section>
+          <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
+            <div className="text-sm font-semibold">Property Details</div>
+            <main className="flex flex-col gap-1">
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Price
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  &#8358;{listing.price.toLocaleString()}
+                </main>
+              </section>
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Property Type
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  {listing.category}
+                </main>
+              </section>
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Building Size
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  {listing.areaSize}
+                </main>
+              </section>
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Bedrooms
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  {listing.bedrooms}
+                </main>
+              </section>
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Bathrooms
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  {listing.bathrooms}
+                </main>
+              </section>
+              <section className="flex items-center gap-1 w-full justify-between">
+                <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
+                  Toilets
+                </main>
+                <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
+                  {listing.toilets}
+                </main>
+              </section>
+            </main>
+          </section>
+          <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
+            <div className="text-sm font-semibold">Features</div>
+            <main className="w-full flex flex-wrap gap-1.5">
+              {listing.features.map((feature, index) => (
+                <div key={index} className="flex items-center">
+                  <BiSolidBadgeCheck className="text-green-500" />
+                  {feature}
+                </div>
+              ))}
+            </main>
+          </section>
+        </article>
       </section>
-      <Newsletter />
-    </>
+    </article>
   );
 }

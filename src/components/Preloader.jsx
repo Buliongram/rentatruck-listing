@@ -9,11 +9,6 @@ export default function Preloader() {
         </span>
         <div className="font-medium text-white loader text-2xl lg:text-3xl tracking-tighter"></div>
       </div>
-      {/* <img
-        src={}
-        alt="icon"
-        className="w-[80px] border rounded-[24px] border-zinc-300"
-      /> */}
     </section>
   );
 }

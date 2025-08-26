@@ -17,6 +17,20 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userRoles = [
+    {
+      role: "User",
+      Route: "/dashboard",
+    },
+    {
+      role: "Agent",
+      Route: "/agency",
+    },
+    {
+      role: "Admin",
+      Route: "/admin",
+    },
+  ];
 
   const [loginInputs, setLoginInputs] = useState({
     email: "",
@@ -52,7 +66,8 @@ export default function Login() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (userState) navigate("/dashboard");
+    const userRole = userRoles.find((r) => r.role === userState?.role);
+    if (userState && userRole) navigate(userRole.Route);
   }, [userState]);
 
   const handleChange = (e) => {
