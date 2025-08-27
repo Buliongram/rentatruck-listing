@@ -11,6 +11,8 @@ import {
   IoStarOutline,
 } from "react-icons/io5";
 import NoRecord from "../../components/NoRecord";
+import { MdReviews } from "react-icons/md";
+
 import { LuBed, LuChevronLeft, LuChevronRight, LuToilet } from "react-icons/lu";
 import {
   BiArea,
@@ -48,6 +50,7 @@ export default function SingleListing() {
   const [agent, setAgent] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingReviews, setLoadingReviews] = useState(false);
   const [isFavouriting, setIsFavouriting] = useState(false);
   const [isEnquiring, setIsEnquiring] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -57,6 +60,7 @@ export default function SingleListing() {
     email: "",
     number: "",
     message: "",
+    medium: "message",
   });
 
   useEffect(() => {
@@ -72,6 +76,11 @@ export default function SingleListing() {
         setListing(data.listing);
         setAgent(data.agent);
         setReviews(data.reviews);
+        setReviewInput({
+          ...reviewInput,
+          property: data.listing._id,
+          agent: data.agent._id,
+        });
         setEnquiryInput((prev) => ({
           ...prev,
           message: `Hello ${data.agent.firstname} ${
@@ -92,6 +101,30 @@ export default function SingleListing() {
     fetchListing();
   }, [params.id, navigate]);
 
+  const [reviewInput, setReviewInput] = useState({
+    fullname: "",
+    email: "",
+    message: "",
+    reviewType: "listing",
+    property: "",
+    agent: "",
+    rating: 0,
+    user: user ? user._id : "",
+  });
+
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const handleReviewInputChange = (e) => {
+    setReviewInput((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleRatingChange = (newRating) => {
+    setReviewInput((prev) => ({
+      ...prev,
+      rating: newRating,
+    }));
+  };
   const handlePrevImage = () => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? listing.images.length - 1 : prevIndex - 1
@@ -166,6 +199,42 @@ export default function SingleListing() {
       toast.error(errorMessage, { id: toastId });
     } finally {
       setIsEnquiring(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setLoadingReviews(true);
+    const toastId = toast.loading("Submitting your reviews...");
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/reviews/store`,
+        { ...reviewInput, user: user ? user._id : "" },
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.error) {
+        toast.error(res.data.message, { id: toastId });
+      } else {
+        toast.success(res.data.message, { id: toastId });
+        setReviewInput({
+          fullname: "",
+          email: "",
+          message: "",
+          rating: "",
+          user: user ? user._id : "",
+        });
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "An unknown error occurred. Please try again.";
+      toast.error(errorMessage, { id: toastId });
+    } finally {
+      setLoadingReviews(false);
     }
   };
 
@@ -387,7 +456,7 @@ export default function SingleListing() {
         </article>
         <article className="w-full max-w-[350px] shrink-0 flex flex-col gap-4">
           <section className="flex flex-col gap-4 p-5 rounded-2xl border border-zinc-200 bg-white items-center w-full">
-            <main className="flex items-center justify-between text-sm font-semibold w-full">
+            <main className="flex items-center justify-between text-lg font-semibold w-full">
               Agent Profile
               <FaEllipsisH />
             </main>
@@ -427,7 +496,7 @@ export default function SingleListing() {
             </main>
           </section>
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full">
-            <div className="text-sm font-semibold">Request Enquiry</div>
+            <div className="text-lg font-semibold">Request Enquiry</div>
             <form onSubmit={handleEnquiries} className="flex flex-col gap-2">
               <main className="flex gap-2">
                 <label htmlFor="name" className="text-[11px]">
@@ -520,7 +589,7 @@ export default function SingleListing() {
             </form>
           </section>
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
-            <div className="text-sm font-semibold">Property Details</div>
+            <div className="text-lg font-semibold">Property Details</div>
             <main className="flex flex-col gap-1">
               <section className="flex items-center gap-1 w-full justify-between">
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
@@ -573,7 +642,7 @@ export default function SingleListing() {
             </main>
           </section>
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
-            <div className="text-sm font-semibold">Features</div>
+            <div className="text-lg font-semibold">Features</div>
             <main className="w-full flex flex-wrap gap-1.5">
               {listing.features.map((feature, index) => (
                 <div key={index} className="flex items-center">
@@ -582,6 +651,90 @@ export default function SingleListing() {
                 </div>
               ))}
             </main>
+          </section>
+
+          <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full">
+            <div className="text-lg font-semibold">Write a review</div>
+            <div
+              className="flex items-center gap-1.5 -mt-2 text-xl cursor-pointer"
+              onMouseLeave={() => setHoveredRating(0)}
+            >
+              {[...Array(5)].map((_, i) => {
+                const ratingValue = i + 1;
+                return (
+                  <span
+                    key={i}
+                    onClick={() => handleRatingChange(ratingValue)}
+                    onMouseEnter={() => setHoveredRating(ratingValue)}
+                  >
+                    {ratingValue <= reviewInput.rating ||
+                    ratingValue <= hoveredRating ? (
+                      <FaStar className="text-yellow-500 transition-all duration-200" />
+                    ) : (
+                      <FaRegStar className="text-yellow-500 transition-all duration-200" />
+                    )}
+                  </span>
+                );
+              })}
+            </div>
+            <form onSubmit={handleReviewSubmit} className="flex flex-col gap-2">
+              <main className="flex gap-2">
+                <label htmlFor="name" className="text-[11px]">
+                  Name
+                </label>
+                <input
+                  name="fullname"
+                  value={reviewInput.fullname}
+                  onChange={handleReviewInputChange}
+                  required
+                  type="text"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  placeholder="Enter full name"
+                />
+              </main>
+              <main className="flex gap-2">
+                <label htmlFor="email" className="text-[11px]">
+                  Email
+                </label>
+                <input
+                  value={reviewInput.email}
+                  onChange={handleReviewInputChange}
+                  required
+                  name="email"
+                  type="email"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  placeholder="Enter email address"
+                />
+              </main>
+
+              <main className="flex gap-2">
+                <label htmlFor="message" className="text-[11px]">
+                  Message
+                </label>
+                <textarea
+                  onChange={handleReviewInputChange}
+                  required
+                  name="message"
+                  id="message"
+                  rows={4}
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
+                  placeholder="Enter your message"
+                  value={reviewInput.message}
+                />
+              </main>
+              <button
+                type="submit"
+                className="flex items-center gap-1 rounded-xl justify-center w-full bg-primary text-xs text-white px-6 py-2.5 cursor-pointer"
+              >
+                {loadingReviews ? (
+                  <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block my-1 "></span>
+                ) : (
+                  <>
+                    <MdReviews /> Submit
+                  </>
+                )}
+              </button>
+            </form>
           </section>
         </article>
       </section>

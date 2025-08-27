@@ -252,14 +252,14 @@ export default function AdminListings() {
             ""
           ) : (
             <section className="flex items-center justify-between">
-              <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-zinc-950">
+              <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-blue-600">
                 {categories.map((item) => (
                   <span
                     key={item.name}
                     onClick={() => setListingType(item.name.toLowerCase())}
                     className={`rounded-xl px-6 py-1.5 cursor-pointer transition duration-200 ${
                       listingType === item.name.toLowerCase()
-                        ? "bg-emerald-950 text-white"
+                        ? "bg-blue-600 text-white"
                         : "hover:bg-white"
                     }`}
                   >
@@ -267,7 +267,7 @@ export default function AdminListings() {
                   </span>
                 ))}
               </main>
-              <span className="bg-emerald-950 text-white px-7 text-xs font-medium py-2 rounded-xl">
+              <span className="bg-blue-600 text-white px-7 text-xs font-medium py-2 rounded-xl">
                 {loading ? (
                   <GreenSpinner />
                 ) : (
@@ -381,12 +381,12 @@ export default function AdminListings() {
                     <div className="top-4 absolute z-[2] left-4 p-3 w-max rounded-3xl shadow-lg bg-white flex flex-col gap-1">
                       <span
                         onClick={() => handleEditListing(house._id)}
-                        className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                       >
                         Edit
                       </span>
                       <span
-                        className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                         onClick={() =>
                           handleStatusChange(house._id, "archived")
                         }
@@ -394,14 +394,14 @@ export default function AdminListings() {
                         Archive
                       </span>
                       <a
-                        className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                         onClick={() => handleStatusChange(house._id, "active")}
                       >
                         Make Active
                       </a>
                       {house.purpose === "For Sale" && (
                         <a
-                          className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                          className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                           onClick={() => handleStatusChange(house._id, "sold")}
                         >
                           Mark as Sold
@@ -410,7 +410,7 @@ export default function AdminListings() {
                       {(house.purpose === "For Rent" ||
                         house.purpose === "Short Let") && (
                         <a
-                          className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                          className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                           onClick={() =>
                             handleStatusChange(house._id, "rented")
                           }
@@ -419,7 +419,7 @@ export default function AdminListings() {
                         </a>
                       )}
                       <span
-                        className="bg-emerald-950 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
+                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
                         onClick={() => confirmDelete(house._id)}
                       >
                         Delete
@@ -452,12 +452,13 @@ export default function AdminListings() {
                           {house?.title}
                         </h3>
                         <ShareButton
+                          color={"blue-600"}
                           listingTitle={house?.title}
                           listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
                         />
                       </section>
                       <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                        <FaLocationDot className="text-emerald-950" />
+                        <FaLocationDot className="text-blue-600" />
                         {house?.location.area + ", " + house?.location.state}
                       </p>
                     </article>
@@ -467,7 +468,7 @@ export default function AdminListings() {
                       </h3>
                       <Link
                         to={`/listing/${house?._id}`}
-                        className="p-2 bg-emerald-950 text-white rounded-lg cursor-pointer"
+                        className="p-2 bg-blue-600 text-white rounded-lg cursor-pointer"
                       >
                         <FaEye className="text-[10px]" />
                       </Link>
@@ -492,7 +493,7 @@ export default function AdminListings() {
                 <div className="flex items-center w-full gap-4">
                   <span
                     onClick={() => setToggleDelete(false)}
-                    className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                    className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
                   >
                     Cancel
                   </span>

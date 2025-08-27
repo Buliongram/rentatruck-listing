@@ -56,7 +56,7 @@ const DashboadReviews = lazy(() => import("./panel/user/Reviews"));
 const Wishlist = lazy(() => import("./panel/user/Wishlist"));
 const Messages = lazy(() => import("./panel/user/Messages"));
 const Support = lazy(() => import("./panel/user/Support"));
-const UserDashboard = lazy(() => import("./panel/user/UserDashboard"));
+const UserDashboard = lazy(() => import("./user/pages/UserDasboard"));
 
 export default function App() {
   const userRoles = [
@@ -128,9 +128,9 @@ export default function App() {
     return (
       <Suspense fallback={<Preloader />}>
         <PanelSidebar />
-        <section className="lg:ml-[200px] bg-zinc-100/60 relative ">
+        <section className="lg:ml-[200px] bg-zinc-100/60 p-4">
           <PanelHeader />
-          <main className="p-6 ">
+          <main className="mt-4 ">
             <Outlet />
           </main>
         </section>

@@ -1,6 +1,6 @@
 import React from "react";
 import { BiMessageSquareDetail, BiSupport, BiUser } from "react-icons/bi";
-import { FaRegHeart } from "react-icons/fa6";
+import { FaCrown, FaMagento, FaRegHeart } from "react-icons/fa6";
 import { GoShield } from "react-icons/go";
 import { HiOutlineHomeModern } from "react-icons/hi2";
 import { IoGridOutline } from "react-icons/io5";
@@ -8,6 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { MdOutlineReviews } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { LuHouse } from "react-icons/lu";
+import { bluebg } from "../../assets/images/images";
 
 export default function PanelSidebar() {
   const location = useLocation();
@@ -75,9 +76,9 @@ export default function PanelSidebar() {
       <Link
         key={id}
         to={path}
-        className={`px-4 py-2 text-xs rounded-xl  flex items-center gap-1 border-b border-transparent font-medium ${
+        className={`px-4 py-2 text-xs rounded-xl  flex items-center gap-1 border-b border-transparent font-semibold ${
           location.pathname === path
-            ? "bg-emerald-950 text-white"
+            ? "bg-blue-600 text-white"
             : "text-zinc-700 hover:bg-zinc-100/70"
         } `}
       >
@@ -89,29 +90,35 @@ export default function PanelSidebar() {
   return (
     <>
       <section className="fixed w-[200px] bg-white top-0 left-0 h-full flex flex-col justify-between p-4 py-6 items-center">
-        <div className="flex items-center gap-1 text-sm pb-4 border-b border-zinc-200">
-          <span className="h-7 w-7 rounded-lg bg-emerald-950 text-white flex items-center justify-center">
+        {/* <div className="flex items-center gap-1 text-sm pb-4 border-b border-zinc-200">
+          <span className="h-7 w-7 rounded-lg bg-blue-600 text-white flex items-center justify-center">
             <HiOutlineHomeModern />
           </span>
-          <span className="text-[16px] font-semibold text-emerald-9bg-emerald-950">
+          <span className="text-[16px] font-semibold text-emerald-9bg-blue-600">
             RentaHome
           </span>
-        </div>
+        </div> */}
 
         <section className="flex flex-col w-full gap-1">
           {renderLinks()}
         </section>
 
-        <section className="flex flex-col w-full rounded-3xl border border-zinc-200 p-4 gap-3 h-max bg-zinc-100/60">
-          <span className="h-8 w-8 flex items-center justify-center bg-emerald-950 rounded-lg"></span>
-          <p className="text-[11px] leading-tight text-zinc-500 font-normal">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde,
-            illum.
-          </p>
-          <Link className=" bg-emerald-950 text-white text-xs py-2 px-4 rounded-lg text-center ">
-            Click Me
-          </Link>
-        </section>
+        <div className="flex flex-col gap-3 rounded-3xl p-3 relative">
+          <span className="h-9 w-9 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center relative z-10">
+            <FaCrown />
+          </span>
+          <span className="text-xs font-medium leading-tight text-white relative z-10">
+            Subscribe to unlock more powerful and streamlined features
+          </span>
+          <span className="text-xs bg-blue-600 text-white px-6 rounded-full py-2 w-max relative z-10">
+            Subscribe Now!
+          </span>
+          <img
+            src={bluebg}
+            className="h-full absolute top-0 left-0 w-full rounded-3xl object-cover opacity-90 z-0"
+            alt="blue background"
+          />
+        </div>
       </section>
     </>
   );

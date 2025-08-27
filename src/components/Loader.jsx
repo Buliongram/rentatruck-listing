@@ -1,9 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function Loader() {
+export default function Loader({ padding }) {
   return (
-    <StyledWrapper className=" py-40 mx-auto flex items-center justify-center">
+    <StyledWrapper
+      className={`py-${
+        padding || "40"
+      } mx-auto flex items-center justify-center`}
+    >
       <div id="wifi-loader">
         <svg className="circle-outer" viewBox="0 0 86 86">
           <circle className="back" cx={43} cy={43} r={40} />

@@ -1,31 +1,39 @@
 import { FaChevronDown, FaMagento } from "react-icons/fa6";
-import { AiOutlineSearch, AiOutlineUser } from "react-icons/ai";
 import { IoMenu } from "react-icons/io5";
-import { HiOutlineHomeModern } from "react-icons/hi2";
 import { Link, useLocation } from "react-router-dom";
 import { FiHome } from "react-icons/fi";
 import { CiLogin } from "react-icons/ci";
 import { BsArrowRight, BsFolder2Open } from "react-icons/bs";
-import { IoMdContact } from "react-icons/io";
 import { RiServiceLine, RiShieldKeyholeLine } from "react-icons/ri";
+import { useSelector } from "react-redux";
 import {
   FaQuestionCircle,
   FaRegNewspaper,
   FaUsers,
   FaCity,
-  FaFileAlt,
 } from "react-icons/fa";
-import {
-  MdGavel,
-  MdRateReview,
-  MdContactMail,
-  MdEmail,
-  MdDashboard,
-} from "react-icons/md";
+import { MdGavel, MdRateReview, MdContactMail } from "react-icons/md";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { IoImagesOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { HiOutlineViewGridAdd } from "react-icons/hi";
+
 export default function Header() {
+  const user = useSelector((state) => state.user);
+  const userRoles = [
+    {
+      role: "User",
+      Route: "/dashboard",
+    },
+    {
+      role: "Agent",
+      Route: "/agency",
+    },
+    {
+      role: "Admin",
+      Route: "/admin",
+    },
+  ];
   const navLinks = [
     {
       id: "1",
@@ -106,6 +114,8 @@ export default function Header() {
       icon: <IoImagesOutline />,
     },
   ];
+  const userRole = userRoles.find((r) => r.role === user?.role);
+
   const [dropdown, Setdropdown] = useState(false);
   const location = useLocation();
   const renderLinks = () => {
@@ -190,16 +200,30 @@ export default function Header() {
         </main>
 
         <section className="hidden lg:flex items-center gap-3 text-sm">
-          <Link to={"/login"}>Log in</Link>
-          <Link
-            to={"/register"}
-            className="flex items-center gap-2 bg-white text-primary p-1 rounded-full pl-4"
-          >
-            Sign up{" "}
-            <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center">
-              <BsArrowRight />
-            </span>
-          </Link>
+          {user ? (
+            <Link
+              to={user && userRole ? userRole.Route : "/dashboard"}
+              className="flex items-center gap-2 bg-white text-primary p-1 rounded-full pl-4"
+            >
+              Dashboard
+              <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center">
+                <HiOutlineViewGridAdd />
+              </span>
+            </Link>
+          ) : (
+            <>
+              <Link to={"/login"}>Log in</Link>{" "}
+              <Link
+                to={"/register"}
+                className="flex items-center gap-2 bg-white text-primary p-1 rounded-full pl-4"
+              >
+                Sign up{" "}
+                <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center">
+                  <BsArrowRight />
+                </span>
+              </Link>
+            </>
+          )}
         </section>
         {/* <section className="hidden lg:flex items-center gap-10 ">
           <main className="flex items-center gap-5 text-black">

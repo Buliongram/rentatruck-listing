@@ -1,7 +1,7 @@
 import React from "react";
 import { FaShareAlt } from "react-icons/fa";
 
-const ShareButton = ({ listingTitle, listingUrl }) => {
+const ShareButton = ({ listingTitle, listingUrl, color }) => {
   const handleShare = async () => {
     // Check if the Web Share API is supported
     if (navigator.share) {
@@ -28,7 +28,7 @@ const ShareButton = ({ listingTitle, listingUrl }) => {
   return (
     <span
       onClick={handleShare}
-      className="p-2 bg-emerald-950 text-white rounded-lg cursor-pointer"
+      className={`p-2 bg-${color} text-white rounded-lg cursor-pointer`}
     >
       <FaShareAlt className="text-[10px]" />
     </span>

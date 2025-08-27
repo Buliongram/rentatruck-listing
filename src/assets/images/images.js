@@ -8,6 +8,7 @@ import google from "./vectors/google.png";
 import facebook from "./vectors/facebook.png";
 import twitter from "./vectors/twitter.png";
 import shield from "./vectors/shield.png";
+import bluebg from "./vectors/bluebg.jpg";
 import wishlist from "./vectors/wishlist.gif";
 
 export {
@@ -20,6 +21,7 @@ export {
   facebook,
   google,
   twitter,
+  bluebg,
   shield,
   wishlist,
 };

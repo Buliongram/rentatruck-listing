@@ -162,7 +162,6 @@ export default function CreateListing() {
     }
   };
   const handlePurposeChange = (purpose) => {
-    
     setFormData((prev) => ({ ...prev, purpose }));
   };
 
@@ -213,7 +212,6 @@ export default function CreateListing() {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
-          
         },
       });
 
@@ -729,8 +727,8 @@ export default function CreateListing() {
       </article>
       <button
         type="submit"
+        className="w-full py-2 bg-blue-600 cursor-pointer text-white rounded-xl font-semibold text-sm hover:bg-blue-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[200px]"
         disabled={loading}
-        className="w-full py-3 bg-emerald-950 text-white rounded-xl font-semibold text-lg hover:bg-emerald-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         {loading ? "Submitting..." : "Create Listing"}
       </button>
