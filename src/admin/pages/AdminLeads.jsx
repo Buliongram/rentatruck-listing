@@ -32,7 +32,7 @@ export default function AdminLeads() {
     modal: false,
     message: "",
   });
-  const cacheKey = `RentaHome-enquiry-cache-${user._id}`;
+  const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
   const [enquiries, setEnquiries] = useState([]);
   const [filteredEnquiries, setFilteredEnquiries] = useState([]);
 
@@ -45,7 +45,7 @@ export default function AdminLeads() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/enquiry/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/enquiry/updatedAt`, {
           withCredentials: true,
         });
 
@@ -59,7 +59,7 @@ export default function AdminLeads() {
         setEnquiries(data);
         localStorage.setItem(cacheKey, JSON.stringify({ data, lastUpdated }));
       } catch (err) {
-        toast.error("Failed to fetch enquiries.");
+        toast.error("Failed to fetch enquiries.", { id: "123" });
       } finally {
         setLoading(false);
       }

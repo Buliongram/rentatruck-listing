@@ -44,10 +44,10 @@ export default function Reviews() {
     if (!user?._id) return;
 
     const fetchReviews = async () => {
-      const url =
+      const API_URL =
         window.location.hostname === "localhost"
-          ? `http://localhost:5000/api/reviews`
-          : `https://rentahome-server.onrender.com/api/reviews`;
+          ? `http://localhost:5000/api`
+          : `https://rentahome-server.onrender.com/api`;
 
       setLoading(true);
       const cacheKey = `RentaHome-reviews-cache-${user._id}`;
@@ -56,7 +56,7 @@ export default function Reviews() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/review/updatedAt`);
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setReviews(cached.fetchedReviews);
@@ -65,7 +65,7 @@ export default function Reviews() {
         }
 
         const { data } = await axios.post(
-          `${url}/fetch`,
+          `${API_URL}/review/fetch`,
           { userId: user._id },
           { withCredentials: true }
         );
@@ -159,7 +159,7 @@ export default function Reviews() {
       ) : (
         <>
           {loading ? (
-           'Loading Reviews'
+            "Loading Reviews"
           ) : (
             <section className="flex flex-col items-center justify-center mx-auto gap-2 h-[400px]">
               <img

@@ -6,10 +6,9 @@ import { HiOutlineChevronUpDown } from "react-icons/hi2";
 import NoRecord from "../../components/NoRecord";
 import Loader from "../../components/Loader";
 import toast from "react-hot-toast";
-import { MdOutlineMessage } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
 import { FaXmark } from "react-icons/fa6";
-
+import { format, parseISO } from "date-fns";
 const API_URL =
   window.location.hostname === "localhost"
     ? `http://localhost:5000/api`
@@ -22,7 +21,7 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [userToDelete, setUserToDelete] = useState(null);
   const [toggleDelete, setToggleDelete] = useState(false);
-  const cacheKey = `RentaHome-user-cache-${user._id}`;
+  const cacheKey = `househunter-user-cache-admin-dashboard-${user._id}`;
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
 
@@ -36,6 +35,7 @@ export default function AdminUsers() {
   ];
 
   const tableHeaders = [
+    "Date Joined",
     "Name",
     "Phone Number",
     "Email",
@@ -87,7 +87,7 @@ export default function AdminUsers() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/user/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -100,7 +100,7 @@ export default function AdminUsers() {
         setUsers(data);
         localStorage.setItem(cacheKey, JSON.stringify({ data, lastUpdated }));
       } catch (err) {
-        toast.error("Failed to fetch users.");
+        toast.error("Failed to fetch users.", { id: "123" });
       } finally {
         setLoading(false);
       }
@@ -251,6 +251,7 @@ export default function AdminUsers() {
             <tbody>
               {filteredUsers.map((user) => (
                 <tr key={user._id}>
+                  <td>{format(parseISO(user.createdAt), "E, d MMMM yyyy")}</td>
                   <td className="capitalize">
                     {user.firstname} {user.middlename} {user.lastname}
                   </td>

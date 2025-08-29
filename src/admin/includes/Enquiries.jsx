@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import CircularProgress from "../components/CircularProgress";
 import GreenSpinner from "../components/GreenSpinner";
-import { MdMessage, MdOutlineMessage, MdOutlinePermPhoneMsg } from "react-icons/md";
+import {
+  MdMessage,
+  MdOutlineMessage,
+  MdOutlinePermPhoneMsg,
+} from "react-icons/md";
 import { FaRegNewspaper, FaSquareWhatsapp } from "react-icons/fa6";
 import { HiOutlineChevronUpDown } from "react-icons/hi2";
 import { Link } from "react-router-dom";
@@ -17,29 +21,32 @@ import {
   Legend,
 } from "chart.js";
 import { FaUsers } from "react-icons/fa";
+import Loader from "../../components/Loader";
+import NoRecord from "../../components/NoRecord";
 
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
-export default function Enquiries({ listings, agents }) {
+export default function Enquiries({ listings, agents, fetching }) {
   const user = useSelector((state) => state.user);
   const API_URL =
     window.location.hostname === "localhost"
       ? `http://localhost:5000/api`
       : `https://rentahome-server.onrender.com/api`;
-  const cacheKey = `RentaHome-enquiry-cache-${user._id}`;
+
   const [enquiries, setEnquiries] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({ type: "", status: false });
   const [users, setUsers] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [contacts, setContacts] = useState([]);
   useEffect(() => {
     const fetchEnquiries = async () => {
-      setLoading(true);
+      setLoading({ type: "enquiry", status: true });
+      const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/enquiry/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/enquiry/updatedAt`, {
           withCredentials: true,
         });
 
@@ -55,18 +62,17 @@ export default function Enquiries({ listings, agents }) {
       } catch (err) {
         toast.error("Failed to fetch enquiries.");
       } finally {
-        setLoading(false);
+        setLoading({ type: "enquiry", status: false });
       }
     };
-
     const fetchUsers = async () => {
-      const cached = JSON.parse(
-        localStorage.getItem(`RentaHome-user-cache-${user._id}`)
-      );
+      setLoading({ type: "user", status: true });
+      const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
+      const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/user/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -78,18 +84,18 @@ export default function Enquiries({ listings, agents }) {
         });
         setUsers(data);
         localStorage.setItem(
-          `RentaHome-user-cache-${user._id}`,
+          `househunter-user-cache-dadmin-dashboard-${user._id}`,
           JSON.stringify({ data, lastUpdated })
         );
       } catch (err) {
         toast.error("Failed to fetch users.");
       } finally {
-        setLoading(false);
+        setLoading({ type: "user", status: false });
       }
     };
     fetchUsers();
     fetchEnquiries();
-  }, [cacheKey]);
+  }, []);
   const tableHeaders = [
     "Name",
     "Phone Number",
@@ -155,7 +161,7 @@ export default function Enquiries({ listings, agents }) {
           <main className="flex flex-col gap-1">
             <p className="text-xs text-zinc-500">Total Enquiries</p>
             <h3 className="font-bold text-2xl font-primary">
-              {loading ? (
+              {loading.type === "enquiry" && loading.status ? (
                 <GreenSpinner />
               ) : (
                 <>{enquiries && enquiries.length}</>
@@ -173,7 +179,11 @@ export default function Enquiries({ listings, agents }) {
           <main className="flex flex-col gap-1">
             <p className="text-xs text-zinc-500 ">Message</p>
             <h3 className="font-bold text-2xl text-orange-600 font-primary">
-              {loading ? <GreenSpinner /> : <>{messageEnquiry}</>}
+              {loading.type === "enquiry" && loading.status ? (
+                <GreenSpinner />
+              ) : (
+                <>{messageEnquiry}</>
+              )}
             </h3>
           </main>
           <CircularProgress
@@ -189,7 +199,11 @@ export default function Enquiries({ listings, agents }) {
           <main className="flex flex-col gap-1">
             <p className="text-xs text-zinc-500">Phone</p>
             <h3 className="font-bold text-2xl font-primary text-indigo-600">
-              {loading ? <GreenSpinner /> : <>{phoneEnquiry}</>}
+              {loading.type === "enquiry" && loading.status ? (
+                <GreenSpinner />
+              ) : (
+                <>{phoneEnquiry}</>
+              )}
             </h3>
           </main>
           <CircularProgress
@@ -204,7 +218,11 @@ export default function Enquiries({ listings, agents }) {
           <main className="flex flex-col gap-1">
             <p className="text-xs text-zinc-500 ">WhatsApp</p>
             <h3 className="font-bold text-2xl font-primary text-green-500">
-              {loading ? <GreenSpinner /> : <>{whatsappEnquiry}</>}
+              {loading.type === "enquiry" && loading.status ? (
+                <GreenSpinner />
+              ) : (
+                <>{whatsappEnquiry}</>
+              )}
             </h3>
           </main>
           <CircularProgress
@@ -227,46 +245,61 @@ export default function Enquiries({ listings, agents }) {
             <IoEyeOutline /> View all
           </Link>
         </div>
-        <table>
-          <thead>
-            <tr>
-              {tableHeaders.map((header, index) => (
-                <th key={header}>
-                  <div className="flex items-center gap-0.5">
-                    {header} <HiOutlineChevronUpDown />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="mt-4">
-            {enquiries.slice(0, 4).map((enquiry) => (
-              <tr key={enquiry._id} className="table-row">
-                <td>{enquiry.name}</td>
-                <td>{enquiry.number}</td>
-                <td>{enquiry.email}</td>
-                <td>{enquiry.country}</td>
-                <td>{`${enquiry.message.slice(0, 40)}....`}</td>
-                <td>
-                  <span
-                    className={`px-3 rounded-full w-max py-0.5 flex items-center gap-1 ${
-                      enquiry.isRead
-                        ? "bg-green-100 text-green-950"
-                        : "bg-amber-100"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        enquiry.isRead ? "bg-green-500" : "bg-amber-500"
-                      }`}
-                    ></span>
-                    <p>{enquiry.isRead ? "Read" : "Unread"}</p>
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+        {loading.type === "enquiry" && loading.status ? (
+          <Loader padding={10} text={"Loading Enquiries"} />
+        ) : (
+          <>
+            {enquiries && enquiries.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    {tableHeaders.map((header, index) => (
+                      <th key={header}>
+                        <div className="flex items-center gap-0.5">
+                          {header} <HiOutlineChevronUpDown />
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="mt-4">
+                  {enquiries.slice(0, 4).map((enquiry) => (
+                    <tr key={enquiry._id} className="table-row">
+                      <td>{enquiry.name}</td>
+                      <td>{enquiry.number}</td>
+                      <td>{enquiry.email}</td>
+                      <td>{enquiry.country}</td>
+                      <td>{`${enquiry.message.slice(0, 40)}....`}</td>
+                      <td>
+                        <span
+                          className={`px-3 rounded-full w-max py-0.5 flex items-center gap-1 ${
+                            enquiry.isRead
+                              ? "bg-green-100 text-green-950"
+                              : "bg-amber-100"
+                          }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              enquiry.isRead ? "bg-green-500" : "bg-amber-500"
+                            }`}
+                          ></span>
+                          <p>{enquiry.isRead ? "Read" : "Unread"}</p>
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <NoRecord
+                fontSize={12}
+                margin={5}
+                text={"No enquiry record found"}
+              />
+            )}
+          </>
+        )}
       </main>
 
       <section className="w-full flex gap-4">
@@ -279,7 +312,11 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Total Blogs</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? <GreenSpinner /> : <>{blogs && blogs.length}</>}
+                  {loading.type === "blog" && loading.status ? (
+                    <GreenSpinner />
+                  ) : (
+                    <>{blogs && blogs.length}</>
+                  )}
                 </h3>
               </main>
               <CircularProgress
@@ -294,7 +331,7 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Published Blogs</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? (
+                  {loading.type === "blog" && loading.status ? (
                     <GreenSpinner />
                   ) : (
                     <>
@@ -323,7 +360,11 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Total Users</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? <GreenSpinner /> : <>{users && users.length}</>}
+                  {loading.type === "user" && loading.status ? (
+                    <GreenSpinner />
+                  ) : (
+                    <>{users && users.length}</>
+                  )}
                 </h3>
               </main>
               <CircularProgress
@@ -338,7 +379,7 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Active Users</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? (
+                  {loading.type === "user" && loading.status ? (
                     <GreenSpinner />
                   ) : (
                     <>
@@ -366,7 +407,7 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Total Contact</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? (
+                  {loading.type === "contact" && loading.status ? (
                     <GreenSpinner />
                   ) : (
                     <>{contacts && contacts.length}</>
@@ -386,7 +427,7 @@ export default function Enquiries({ listings, agents }) {
               <main className="flex flex-col gap-1">
                 <p className="text-xs text-zinc-500">Unread Contact</p>
                 <h3 className="font-bold text-2xl font-primary">
-                  {loading ? (
+                  {loading.type === "contact" && loading.status ? (
                     <GreenSpinner />
                   ) : (
                     <>

@@ -7,9 +7,10 @@ import {
   BiSupport,
   BiUser,
 } from "react-icons/bi";
-import { BsHouseAdd } from "react-icons/bs";
+import { BsHouse, BsHouseAdd, BsHouseAddFill, BsHouseFill } from "react-icons/bs";
 import { CiBellOn, CiSettings } from "react-icons/ci";
 import {
+  FaHeart,
   FaHouseChimneyUser,
   FaMagento,
   FaRegChartBar,
@@ -17,14 +18,14 @@ import {
   FaUsers,
 } from "react-icons/fa6";
 import { GoShield } from "react-icons/go";
-import { IoExitOutline, IoGridOutline } from "react-icons/io5";
+import { IoExitOutline, IoGrid, IoGridOutline } from "react-icons/io5";
 import { LuHouse, LuMapPinHouse } from "react-icons/lu";
-import { MdMessage, MdOutlineReviews } from "react-icons/md";
+import { MdMessage, MdOutlineReviews, MdReviews } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { updateUser } from "../../assets/store/userSlice";
 
-export default function AdminHeader() {
+export default function AgentHeader() {
   const API_URL =
     window.location.hostname === "localhost"
       ? `http://localhost:5000/api`
@@ -38,50 +39,43 @@ export default function AdminHeader() {
     {
       id: "01",
       name: "Overview",
-      path: "/admin",
-      icon: <IoGridOutline />,
+      path: "/agency",
+      icon: <IoGrid />,
       user: false,
     },
     {
       id: "1",
       name: "Listings",
-      path: "/admin/listings",
-      icon: <LuHouse />,
+      path: "/agency/listings",
+      icon: <BsHouseFill />,
       user: false,
     },
     {
       id: "2",
       name: "Post Property",
-      path: "/admin/create/listing",
-      icon: <BsHouseAdd />,
+      path: "/agency/listing/create",
+      icon: <BsHouseAddFill />,
       user: false,
     },
     {
       id: "3",
       name: "Enquiries",
-      path: "/admin/enquiries",
+      path: "/agency/enquiries",
       icon: <MdMessage />,
       user: false,
     },
     {
-      id: "4",
-      name: "Statistics",
-      path: "/admin/statistics",
-      icon: <FaRegChartBar />,
-      user: false,
-    },
-    {
-      id: "5",
-      name: "Users",
-      path: "/admin/users",
-      icon: <FaUsers />,
-      user: false,
-    },
-    {
       id: "6",
-      name: "Agents",
-      path: "/admin/agents",
-      icon: <LuMapPinHouse />,
+      name: "Reviews",
+      path: "/agency/reviews",
+      icon: <MdReviews />,
+      user: false,
+    },
+    {
+      id: "7",
+      name: "Saved Items",
+      path: "/agency/saved-items",
+      icon: <FaHeart />,
       user: false,
     },
   ];
@@ -140,7 +134,7 @@ export default function AdminHeader() {
     {
       id: "1",
       name: "Overview",
-      path: "/admin",
+      path: "/agency",
       icon: <IoGridOutline />,
       user: true,
     },

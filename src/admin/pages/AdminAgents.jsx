@@ -24,7 +24,7 @@ export default function AdminAgents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [agentToDelete, setAgentToDelete] = useState(null);
   const [toggleDelete, setToggleDelete] = useState(false);
-  const cacheKey = `RentaHome-agent-cache-${user._id}`;
+  const cacheKey = `househunter-agent-cache-admin-dashboard-${user._id}`;
   const [agents, setAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
 
@@ -92,7 +92,7 @@ export default function AdminAgents() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/agent/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/agent/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -256,9 +256,7 @@ export default function AdminAgents() {
             <tbody>
               {filteredAgents.map((agent) => (
                 <tr key={agent._id}>
-                  <td>
-                    {format(parseISO(agent.createdAt), "E, d MMMM yyyy")}
-                  </td>
+                  <td>{format(parseISO(agent.createdAt), "E, d MMMM yyyy")}</td>
                   <td className="capitalize">
                     {agent.firstname} {agent.middlename} {agent.lastname}
                   </td>

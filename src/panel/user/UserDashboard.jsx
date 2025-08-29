@@ -11,6 +11,11 @@ import { GiBlockHouse } from "react-icons/gi";
 import axios from "axios";
 
 export default function UserDashboard() {
+  const API_URL =
+    window.location.hostname === "localhost"
+      ? `http://localhost:5000/api`
+      : `https://rentahome-server.onrender.com/api`;
+
   const user = useSelector((state) => state.user);
   const [greeting, setGreeting] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,11 +36,6 @@ export default function UserDashboard() {
     }
     setGreeting(greet);
     const fetchReviews = async () => {
-      const url =
-        window.location.hostname === "localhost"
-          ? `http://localhost:5000/api/reviews`
-          : `https://rentahome-server.onrender.com/api/reviews`;
-
       setLoading(true);
       const cacheKey = `RentaHome-reviews-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -43,7 +43,7 @@ export default function UserDashboard() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/review/updateAt`);
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setReviews(cached.fetchedReviews);
@@ -52,7 +52,7 @@ export default function UserDashboard() {
         }
 
         const { data } = await axios.post(
-          `${url}/fetch`,
+          `${API_URL}/review/fetch`,
           { userId: user._id },
           { withCredentials: true }
         );
@@ -71,13 +71,7 @@ export default function UserDashboard() {
         setLoading(false);
       }
     };
-
     const fetchWishlist = async () => {
-      const url =
-        window.location.hostname === "localhost"
-          ? `http://localhost:5000/api/wishlist`
-          : `https://rentahome-server.onrender.com/api/wishlist`;
-
       setLoading(true);
       const cacheKey = `RentaHome-wishlist-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -85,7 +79,7 @@ export default function UserDashboard() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/favourite/updateAt`);
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setReviews(cached.fetchedReviews);
@@ -94,7 +88,7 @@ export default function UserDashboard() {
         }
 
         const { data } = await axios.post(
-          `${url}/fetch`,
+          `${API_URL}/wishlist/fetch`,
           { userId: user._id },
           { withCredentials: true }
         );
@@ -114,11 +108,6 @@ export default function UserDashboard() {
       }
     };
     const fetchListings = async () => {
-      const url =
-        window.location.hostname === "localhost"
-          ? `http://localhost:5000/api/reviews`
-          : `https://rentahome-server.onrender.com/api/reviews`;
-
       setLoading(true);
       const cacheKey = `RentaHome-reviews-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -126,7 +115,7 @@ export default function UserDashboard() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/lising/updateAt`);
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setReviews(cached.fetchedReviews);
@@ -135,7 +124,7 @@ export default function UserDashboard() {
         }
 
         const { data } = await axios.post(
-          `${url}/fetch`,
+          `${API_URL}/listing/fetch`,
           { userId: user._id },
           { withCredentials: true }
         );

@@ -18,54 +18,7 @@ export default function City() {
   const params = useParams();
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const projectDetails = { projectId: params.id };
   useEffect(() => {
-    const fetchSingleProject = async () => {
-      const url =
-        window.location.hostname === "localhost"
-          ? "http://localhost:5000/api/project"
-          : "https://rentahome-server.onrender.com/api/project";
-
-      const cacheKey = `project${params.id}`;
-      const cached = JSON.parse(localStorage.getItem(cacheKey));
-
-      setLoading(true);
-
-      try {
-        const {
-          data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated/${params.id}`);
-
-        if (cached && cached.lastUpdated === lastUpdated) {
-          setProject(cached.foundData);
-          setLoading(false);
-          return;
-        }
-        const res = await axios.post(`${url}/find`, projectDetails, {
-          withCredentials: true,
-        });
-        const data = res.data;
-
-        if (data.error) {
-          toast.error(data.message, { id: "123" });
-          setTimeout(() => navigate("/projects"), 1000);
-        } else {
-          const foundData = data.findProject;
-          setProject(foundData);
-          localStorage.setItem(
-            cacheKey,
-            JSON.stringify({ foundData, lastUpdated })
-          );
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error("Error fetching project:", err);
-        toast.error("An unknown error occurred", { id: "123" });
-        setTimeout(() => navigate("/projects"), 1000);
-      }
-    };
-
     const neighborhood = listings.filter(
       (listing) => listing.location.replaceAll(" ", "") === params.id.toString()
     );
@@ -75,7 +28,6 @@ export default function City() {
     }
     setLoading(false);
 
-    // fetchSingleProject();
   }, [params.id]);
 
   return (

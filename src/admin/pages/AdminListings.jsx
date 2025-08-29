@@ -3,12 +3,25 @@ import {
   listingCategories,
   nigerianLocations,
 } from "../../data/createListingData";
-import { FaCamera, FaEye, FaLocationDot, FaXmark } from "react-icons/fa6";
-import { banner, noresult } from "../../assets/images/images";
+import {
+  FaCamera,
+  FaEye,
+  FaLocationDot,
+  FaTrash,
+  FaXmark,
+} from "react-icons/fa6";
+
 import axios from "axios";
+import { LuBadgeCheck } from "react-icons/lu";
 import { useSelector } from "react-redux";
 import GreenSpinner from "../components/GreenSpinner";
-import { FaEllipsisV, FaShareAlt } from "react-icons/fa";
+import {
+  FaArchive,
+  FaEllipsisV,
+  FaRegFileArchive,
+  FaShareAlt,
+} from "react-icons/fa";
+import { CiEdit, CiTrash } from "react-icons/ci";
 import { Link, useNavigate } from "react-router-dom";
 import ShareButton from "../components/ShareButton";
 import toast from "react-hot-toast";
@@ -17,10 +30,11 @@ import Loader from "../../components/Loader";
 
 export default function AdminListings() {
   const user = useSelector((state) => state.user);
-  const cacheKey = `RentaHome-listing-cache-${user._id}`;
   const [loading, setLoading] = useState(false);
+  const [spinning, setSpinning] = useState({ type: "", status: false });
   const [toggleDelete, setToggleDelete] = useState(false);
   const [listingToDelete, setListingToDelete] = useState(null);
+  const [selectedListing, setSelectedListing] = useState(null);
   const [allListings, setAllListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [listingType, setListingType] = useState("all");
@@ -33,29 +47,32 @@ export default function AdminListings() {
     priceMax: "",
     state: "",
   });
-  const [showActions, setShowActions] = useState(null);
+  const [showActions, setShowActions] = useState(false);
 
   useEffect(() => {
     const fetchAllListings = async () => {
       const url =
         window.location.hostname === "localhost"
-          ? `http://localhost:5000/api/listing`
-          : `https://rentahome-server.onrender.com/api/listing`;
+          ? `http://localhost:5000/api`
+          : `https://rentahome-server.onrender.com/api`;
 
       setLoading(true);
+      const cacheKey = `househunter-listing-cache-dadmin-dashboard-${user._id}`;
 
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${url}/last-updated`);
+        } = await axios.get(`${url}/timestamp/listing/updatedAt`, {
+          withCredentials: true,
+        });
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setAllListings(cached.data);
           setFilteredListings(cached.data);
           return;
         }
-        const { data } = await axios.get(`${url}/fetch`, {
+        const { data } = await axios.get(`${url}/listing/fetch/dashboard`, {
           withCredentials: true,
         });
         setAllListings(data);
@@ -142,28 +159,58 @@ export default function AdminListings() {
         : `https://rentahome-server.onrender.com/api/listing/${listingId}/status`;
 
     try {
-      setLoading(true);
-      await axios.put(url, { status: newStatus }, { withCredentials: true });
-
-      setAllListings((prevListings) =>
-        prevListings.map((listing) =>
-          listing._id === listingId
-            ? { ...listing, status: newStatus }
-            : listing
-        )
+      toast.loading("Processing your request... Please wait", { id: "123" });
+      setSpinning({ type: newStatus, status: true });
+      const res = await axios.put(
+        url,
+        { status: newStatus },
+        { withCredentials: true }
       );
-      setShowActions(null); // Close actions menu
-    } catch (err) {
-      console.error(err);
+      const data = res.data;
+      if (data.error) {
+        toast.error(data.message, { id: "123" });
+      } else {
+        toast.success(data.message, { id: "123" });
+        setAllListings((list) =>
+          list.map((listing) =>
+            listing._id === listingId
+              ? { ...listing, status: newStatus }
+              : listing
+          )
+        );
+        setFilteredListings((list) =>
+          list.map((listing) =>
+            listing._id === listingId
+              ? { ...listing, status: newStatus }
+              : listing
+          )
+        );
+
+        setShowActions(false);
+      }
+    } catch (error) {
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable update listing status. Please try again",
+          {
+            id: "123",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "123",
+        });
+      }
     } finally {
-      setLoading(false);
+      setSpinning({ type: newStatus, status: false });
     }
   };
 
   const confirmDelete = (listingId) => {
     setListingToDelete(listingId);
     setToggleDelete(true);
-    setShowActions(null);
+    setShowActions(false);
   };
 
   const handleDeleteListing = async () => {
@@ -175,8 +222,8 @@ export default function AdminListings() {
         : `https://rentahome-server.onrender.com/api/listing/delete`;
 
     try {
-      toast.loading("Processing your request. Please wait", { id: "123" });
-      setLoading(true);
+      toast.loading("Deleting listing... Please wait.", { id: "123" });
+      setSpinning({ type: "delete", status: true });
       const res = await axios.post(
         url,
         { listingId: listingToDelete },
@@ -217,7 +264,7 @@ export default function AdminListings() {
         console.log(error);
       }
     } finally {
-      setLoading(false);
+      setSpinning({ type: "delete", status: false });
       setToggleDelete(false);
     }
   };
@@ -361,131 +408,106 @@ export default function AdminListings() {
           </main>
         </article>
         <>
-          <article className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <article
+            className={`grid grid-cols-1 lg:grid-cols-${
+              user.role === "User" ? 3 : 4
+            } gap-4`}
+          >
             {filteredListings.map((house) => (
-              <main key={house._id}>
-                <main className="h-[250px] rounded-3xl relative">
-                  {house.images?.length ? (
+              <main key={house._id} className="h-[250px] rounded-3xl relative">
+                {house.images?.length ? (
+                  <Link
+                    to={`/listing/${house._id}`}
+                    className=" h-full w-full absolute "
+                  >
                     <img
                       src={house?.images[0].url}
                       loading="lazy"
                       className="h-full w-full rounded-2xl object-cover"
                       alt={house?.title}
                     />
-                  ) : (
-                    ""
-                  )}
+                  </Link>
+                ) : (
+                  ""
+                )}
 
-                  {/* Actions Dropdown */}
-                  {showActions === house._id && (
-                    <div className="top-4 absolute z-[2] left-4 p-3 w-max rounded-3xl shadow-lg bg-white flex flex-col gap-1">
-                      <span
-                        onClick={() => handleEditListing(house._id)}
-                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                      >
-                        Edit
-                      </span>
-                      <span
-                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                        onClick={() =>
-                          handleStatusChange(house._id, "archived")
-                        }
-                      >
-                        Archive
-                      </span>
-                      <a
-                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                        onClick={() => handleStatusChange(house._id, "active")}
-                      >
-                        Make Active
-                      </a>
-                      {house.purpose === "For Sale" && (
-                        <a
-                          className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                          onClick={() => handleStatusChange(house._id, "sold")}
-                        >
-                          Mark as Sold
-                        </a>
-                      )}
-                      {(house.purpose === "For Rent" ||
-                        house.purpose === "Short Let") && (
-                        <a
-                          className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                          onClick={() =>
-                            handleStatusChange(house._id, "rented")
-                          }
-                        >
-                          Mark as Rented
-                        </a>
-                      )}
-                      <span
-                        className="bg-blue-600 text-[11px] flex items-center justify-center gap-1 text-white rounded-xl px-6 py-2 cursor-pointer"
-                        onClick={() => confirmDelete(house._id)}
-                      >
-                        Delete
-                      </span>
-                    </div>
-                  )}
+                <div className="absolute top-4 left-4 bg-white rounded-lg text-xs font-medium px-3 py-1">
+                  {house?.category || "House"}
+                </div>
+                {user.role !== "Admin" ? (
+                  ""
+                ) : (
+                  <span
+                    onClick={() => {
+                      setShowActions(true);
+                      setSelectedListing(house._id);
+                    }}
+                    className="p-2 bg-white rounded-lg cursor-pointer absolute top-4 right-4"
+                  >
+                    <FaEllipsisV className="text-[10px]" />
+                  </span>
+                )}
 
-                  <div className="absolute top-4 left-4 bg-white rounded-lg text-xs font-medium px-3 py-1">
-                    {house?.category || "House"}
-                  </div>
-                  {user.role !== "Admin" ? (
-                    ""
-                  ) : (
-                    <span
-                      onClick={() =>
-                        setShowActions(
-                          showActions === house._id ? null : house._id
-                        )
-                      }
-                      className="p-2 bg-white rounded-lg cursor-pointer absolute top-4 right-4"
-                    >
-                      <FaEllipsisV className="text-[10px]" />
-                    </span>
-                  )}
-
-                  <main className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[90%] p-3 bg-white rounded-2xl flex flex-col divide-y divide-zinc-300">
-                    <article className="flex flex-col pb-2 w-full">
-                      <section className="flex items-center justify-between">
-                        <h3 className="text-xs font-semibold font-primary">
-                          {house?.title}
-                        </h3>
-                        <ShareButton
-                          color={"blue-600"}
-                          listingTitle={house?.title}
-                          listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
-                        />
-                      </section>
-                      <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                        <FaLocationDot className="text-blue-600" />
-                        {house?.location.area + ", " + house?.location.state}
-                      </p>
-                    </article>
-                    <article className="flex items-center justify-between pt-2">
+                <main className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[90%] p-3 bg-white rounded-2xl flex flex-col divide-y divide-zinc-300">
+                  <article className="flex flex-col pb-2 w-full">
+                    <section className="flex items-center justify-between">
                       <h3 className="text-xs font-semibold font-primary">
-                        &#8358;{house?.price.toLocaleString()}
+                        {house?.title}
                       </h3>
-                      <Link
-                        to={`/listing/${house?._id}`}
-                        className="p-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+                      <ShareButton
+                        color={"blue-600"}
+                        listingTitle={house?.title}
+                        listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
+                      />
+                    </section>
+                    <p className="text-[10px] text-zinc-500 flex items-center gap-1">
+                      <FaLocationDot className="text-blue-600" />
+                      {house?.location.area + ", " + house?.location.state}
+                    </p>
+                  </article>
+                  <article className="flex items-center justify-between pt-2">
+                    <h3 className="text-xs font-semibold font-primary">
+                      &#8358;{house?.price.toLocaleString()}
+                    </h3>
+                    {user.role === "User" ? (
+                      ""
+                    ) : (
+                      <span
+                        className={`px-3 py-1 rounded-lg capitalize text-[11px] text-white ${
+                          {
+                            active: "bg-green-500",
+                            archived: "bg-gray-500",
+                            sold: "bg-red-500",
+                            rented: "bg-blue-500",
+                            pending: "bg-amber-400",
+                          }[house.status] || "bg-gray-300"
+                        }`}
                       >
-                        <FaEye className="text-[10px]" />
-                      </Link>
-                    </article>
-                  </main>
+                        {house.status}
+                      </span>
+                    )}
+                  </article>
                 </main>
               </main>
             ))}
           </article>
-          {/* Delete Confirmation Modal */}
+
           {toggleDelete && (
             <section className="fixed h-full w-full top-0 left-0 bg-black/60 flex items-center justify-center z-50">
               <section
                 className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[450px] w-full fixed md:relative bottom-0 `}
               >
-                <h2 className="font-medium text-[16px]">Are you sure?</h2>
-                <p className="text-[13px] text-zinc-600 font-normal text-center">
+                <main className="flex items-center justify-between w-full">
+                  <h2 className="font-semibold text-xl">Are you sure?</h2>
+                  <div
+                    onClick={() => setToggleDelete(false)}
+                    className="h-7 w-7 flex items-center justify-center text-sm bg-[#f2f2f2] rounded-full cursor-pointer"
+                  >
+                    <FaXmark />
+                  </div>
+                </main>
+
+                <p className="text-[13px] text-zinc-600 text-center my-4">
                   Deleting this listing is permanent and irreversible. You will
                   lose all your records.
                 </p>
@@ -501,18 +523,106 @@ export default function AdminListings() {
                     onClick={handleDeleteListing}
                     className="flex text-xs items-center justify-center shrink gap-2 text-white bg-[#f30000] font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
                   >
-                    Yes, delete this listing
+                    {spinning.type === "delete" && spinning.status ? (
+                      <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                    ) : (
+                      "Yes, delete this listing"
+                    )}
                   </button>
-                </div>
-
-                <div
-                  onClick={() => setToggleDelete(false)}
-                  className="h-7 w-7 flex items-center justify-center text-sm bg-[#f2f2f2] absolute top-4 right-4 rounded-full cursor-pointer"
-                >
-                  <FaXmark />
                 </div>
               </section>
             </section>
+          )}
+
+          {showActions && (
+            <>
+              <section className="fixed h-full w-full top-0 left-0 bg-black/60 flex items-center justify-center z-50">
+                <section
+                  className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[450px] w-full fixed md:relative bottom-0 `}
+                >
+                  <main className="flex items-center justify-between w-full">
+                    <h2 className="font-semibold text-xl">Select an action</h2>
+                    <div
+                      onClick={() => setShowActions(false)}
+                      className="h-7 w-7 flex items-center justify-center text-sm bg-[#f2f2f2] rounded-full cursor-pointer"
+                    >
+                      <FaXmark />
+                    </div>
+                  </main>
+
+                  <section className="flex flex-col divide-y divide-zinc-200 w-full">
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs  font-semibold flex items-center gap-0.5">
+                        <CiTrash /> Delete Listing
+                      </span>
+                      <button
+                        onClick={() => confirmDelete(selectedListing)}
+                        className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-[#f30000] hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                      >
+                        Proceed to delete
+                      </button>
+                    </main>
+
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs font-semibold flex items-center gap-0.5">
+                        <CiEdit /> Edit Listing
+                      </span>
+                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
+                        Proceed to edit
+                      </button>
+                    </main>
+
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs font-semibold flex items-center gap-0.5">
+                        <FaRegFileArchive /> Archive Listing
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleStatusChange(selectedListing, "archived")
+                        }
+                        className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                      >
+                        {spinning.type === "archived" && spinning.status ? (
+                          <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                        ) : (
+                          "Proceed to archive"
+                        )}
+                      </button>
+                    </main>
+
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs font-semibold flex items-center gap-0.5">
+                        <LuBadgeCheck />
+                        Publish Listing
+                      </span>
+                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
+                        Proceed to publish
+                      </button>
+                    </main>
+
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs font-semibold flex items-center gap-0.5">
+                        <LuBadgeCheck />
+                        Mark as sold
+                      </span>
+                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
+                        Proceed
+                      </button>
+                    </main>
+
+                    <main className="flex items-center justify-between w-full py-1">
+                      <span className="text-xs font-semibold flex items-center gap-0.5">
+                        <LuBadgeCheck />
+                        Mark as rented
+                      </span>
+                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
+                        Proceed
+                      </button>
+                    </main>
+                  </section>
+                </section>
+              </section>
+            </>
           )}
         </>
       </section>

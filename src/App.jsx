@@ -7,7 +7,6 @@ import {
   Navigate,
   Outlet,
   RouterProvider,
-  useNavigate,
 } from "react-router-dom";
 import Homepage from "./home/pages/Homepage";
 import AOS from "aos";
@@ -37,26 +36,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./assets/store/userSlice";
 import axios from "axios";
 
+const AgentDashboard = lazy(() => import("./agent/pages/AgentDashboard"));
+const AgentHeader = lazy(() => import("./agent/components/AgentHeader"));
+const AgentSidebar = lazy(() => import("./agent/components/AgentSidebar"));
+
 const AdminHeader = lazy(() => import("./admin/components/AdminHeader"));
 const AdminStatistics = lazy(() => import("./admin/pages/AdminStatistics"));
 const AdminLeads = lazy(() => import("./admin/pages/AdminLeads"));
 const CreateListing = lazy(() => import("./admin/pages/CreateListing"));
+const EditListing = lazy(() => import("./admin/pages/EditListing"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
-const AdminSidebar = lazy(() => import("./admin/components/AdminSidebar"));
 const AdminListings = lazy(() => import("./admin/pages/AdminListings"));
 const AdminUsers = lazy(() => import("./admin/pages/AdminUsers"));
 const AdminAgents = lazy(() => import("./admin/pages/AdminAgents"));
 const AdminOwners = lazy(() => import("./admin/pages/AdminOwners"));
 
-const PanelHeader = lazy(() => import("./panel/components/PanelHeader"));
-const PanelSidebar = lazy(() => import("./panel/components/PanelSidebar"));
+const UserHeader = lazy(() => import("./user/components/UserHeader"));
+const UserSidebar = lazy(() => import("./user/components/UserSidebar"));
+const UserDashboard = lazy(() => import("./user/pages/UserDasboard"));
+
 const Settings = lazy(() => import("./panel/user/Settings"));
 const Profile = lazy(() => import("./panel/user/Profile"));
 const DashboadReviews = lazy(() => import("./panel/user/Reviews"));
 const Wishlist = lazy(() => import("./panel/user/Wishlist"));
 const Messages = lazy(() => import("./panel/user/Messages"));
 const Support = lazy(() => import("./panel/user/Support"));
-const UserDashboard = lazy(() => import("./user/pages/UserDasboard"));
 
 export default function App() {
   const userRoles = [
@@ -127,9 +131,9 @@ export default function App() {
 
     return (
       <Suspense fallback={<Preloader />}>
-        <PanelSidebar />
+        <UserSidebar />
         <section className="lg:ml-[200px] bg-zinc-100/60 p-4">
-          <PanelHeader />
+          <UserHeader />
           <main className="mt-4 ">
             <Outlet />
           </main>
@@ -157,6 +161,32 @@ export default function App() {
         <section className=" bg-zinc-100/60 p-4 ">
           <AdminHeader />
           <main className="mt-4 ">
+            <Outlet />
+          </main>
+        </section>
+      </Suspense>
+    );
+  }
+
+  function AgentLayout() {
+    if (loadingUser) {
+      return <Preloader />;
+    }
+
+    if (!activeUser) {
+      return <Navigate to={"/login"} />;
+    }
+    const userRole = userRoles.find((r) => r.role === activeUser?.role);
+    if (activeUser && userRole && userRole.Route !== "/agency") {
+      return <Navigate to={userRole.Route} />;
+    }
+
+    return (
+      <Suspense fallback={<Preloader />}>
+        <AgentSidebar />
+        <section className=" bg-zinc-100/60 p-4 ">
+          <AgentHeader />
+          <main className="mt-4 min-h-dvh ">
             <Outlet />
           </main>
         </section>
@@ -223,10 +253,20 @@ export default function App() {
         { path: "/admin/enquiries", element: <AdminLeads /> },
         { path: "/admin/statistics", element: <AdminStatistics /> },
         { path: "/admin/create/listing", element: <CreateListing /> },
+        { path: "/admin/listing/edit", element: <EditListing /> },
         { path: "/admin/listings", element: <AdminListings /> },
         { path: "/admin/users", element: <AdminUsers /> },
         { path: "/admin/agents", element: <AdminAgents /> },
         { path: "/admin/owners", element: <AdminOwners /> },
+      ],
+    },
+    {
+      path: "/agency",
+      element: <AgentLayout />,
+      children: [
+        { path: "/agency", element: <AgentDashboard /> },
+        { path: "/agency/listings", element: <AdminListings /> },
+        { path: "/agency/listing/create", element: <CreateListing /> },
       ],
     },
   ]);

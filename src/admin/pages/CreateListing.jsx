@@ -307,7 +307,7 @@ export default function CreateListing() {
                 onClick={() => handlePurposeChange(item)}
                 className={`w-full py-2.5 text-center rounded-xl border border-transparent text-xs cursor-pointer ${
                   formData.purpose === item
-                    ? "bg-emerald-950 text-white"
+                    ? "bg-blue-600 text-white"
                     : "bg-white border-zinc-200"
                 }`}
               >

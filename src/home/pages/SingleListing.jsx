@@ -148,7 +148,7 @@ export default function SingleListing() {
 
     try {
       const res = await axios.post(
-        `${API_URL}/listing/favorites/add`,
+        `${API_URL}/wishlist/favorites/add`,
         { listingId: listing._id },
         { withCredentials: true }
       );
@@ -293,14 +293,15 @@ export default function SingleListing() {
                   &#8358;{listing.price.toLocaleString()}
                 </h3>
               </section>
-              <section className="flex items-center justify-between text-xs text-zinc-500 font-normal">
+              <section className="flex items-center justify-between text-xs text-zinc-600 font-medium">
                 <div className="flex items-center">
                   <IoLocationOutline />
                   {listing.location.street}
                 </div>
                 <section className="flex items-center gap-3">
                   <main className="flex items-center gap-1">
-                    <IoStarOutline /> 4.8
+                    <IoStarOutline />
+                    {listing.averageRating.toFixed(1)}
                   </main>
                   <main className="flex items-center gap-1">
                     <IoEyeOutline /> {listing.views}
@@ -308,7 +309,7 @@ export default function SingleListing() {
                 </section>
               </section>
             </article>
-            <article className="text-xs text-zinc-500 font-normal leading-tight">
+            <article className="text-[13px] font-medium ">
               {listing.description || "No description provided."}
             </article>
             <article className="flex items-center gap-1 text-[11px]">
@@ -364,18 +365,18 @@ export default function SingleListing() {
                       <div className="flex items-center gap-2">
                         <span className="h-6 w-6 shrink-0 rounded-full bg-zinc-100 relative">
                           <img
-                            src={review.image}
-                            alt={review.name}
+                            src={review.user.profilePhoto}
+                            alt={review.user.fristname}
                             className="h-full w-full rounded-full object-cover"
                           />
                         </span>
                         <section className="flex w-full justify-between">
                           <div className="flex flex-col">
                             <span className="text-xs font-semibold capitalize">
-                              {review.name}
+                              {`${review.user.firstname} ${review.user.lastname}`}
                             </span>
                             <p className="text-[10px] text-primary font-medium">
-                              {review.title}
+                              HouseHunter {review.user.role}
                             </p>
                           </div>
                           <div className="flex items-center gap-1 text-[10px] text-yellow-500">
@@ -387,9 +388,7 @@ export default function SingleListing() {
                           </div>
                         </section>
                       </div>
-                      <p className="text-xs leading-tight text-zinc-600 font-normal">
-                        {review.message}
-                      </p>
+                      <p className="text-xs leading-tight">{review.message}</p>
                     </div>
                   ))}
                 </div>
@@ -473,9 +472,7 @@ export default function SingleListing() {
               </span>
             </main>
             <main className="text-[11px] text-center text-zinc-500 font-normal leading-tight">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-              sed sapiente numquam exercitationem officia voluptatum aperiam,
-              minima fugit voluptas! Pariatur!
+              {agent.bio}
             </main>
             <main className="flex items-center justify-between w-full text-sm">
               <div className="flex items-center gap-1 text-zinc-500">
@@ -490,7 +487,7 @@ export default function SingleListing() {
                 </span>
               </div>
               <div className="text-xs text-white bg-primary font-normal flex items-center gap-1 px-6 py-2 rounded-full">
-                <FaComment />
+                <BiPhoneCall />
                 Get in Touch
               </div>
             </main>
@@ -717,6 +714,7 @@ export default function SingleListing() {
                   name="message"
                   id="message"
                   rows={4}
+                  maxLength={500}
                   className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
                   placeholder="Enter your message"
                   value={reviewInput.message}

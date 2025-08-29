@@ -1,11 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function Loader({ padding }) {
+export default function Loader({ padding, text }) {
   return (
     <StyledWrapper
-      className={`py-${
-        padding || "40"
+      className={`${
+        padding ? `py-${padding}` : "py-40"
       } mx-auto flex items-center justify-center`}
     >
       <div id="wifi-loader">
@@ -22,7 +22,7 @@ export default function Loader({ padding }) {
           <circle className="back" cx={17} cy={17} r={14} />
           <circle className="front" cx={17} cy={17} r={14} />
         </svg>
-        <div className="text" data-text="Loading..." />
+        <div className="text w-max capitalize" data-text={`${text || "Loading..."}`} />
       </div>
     </StyledWrapper>
   );

@@ -29,7 +29,6 @@ export default function UserDasboard() {
       ? `http://localhost:5000/api`
       : `https://rentahome-server.onrender.com/api`;
   const user = useSelector((state) => state.user);
-  const [greeting, setGreeting] = useState("");
   const [loading, setLoading] = useState({ type: "", status: false });
   const [listings, setListings] = useState([]);
   const [wishlist, setWishlist] = useState([]);
@@ -38,13 +37,15 @@ export default function UserDasboard() {
     const fetchListings = async () => {
       setLoading({ type: "listing", status: true });
       const cached = JSON.parse(
-        localStorage.getItem(`RentaHome-listing-cache-${user._id}`)
+        localStorage.getItem(
+          `househunter-listing-cache-user-dashboard-${user._id}`
+        )
       );
 
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/listing/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/listing/updatedAt`);
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setListings(cached.data);
@@ -57,7 +58,7 @@ export default function UserDasboard() {
         });
         setListings(data);
         localStorage.setItem(
-          `RentaHome-listing-cache-${user._id}`,
+          `househunter-listing-cache-user-dashboard-${user._id}`,
           JSON.stringify({ data, lastUpdated })
         );
       } catch (err) {
@@ -70,12 +71,14 @@ export default function UserDasboard() {
     const fetchWishlist = async () => {
       setLoading({ type: "wishlist", status: true });
       const cached = JSON.parse(
-        localStorage.getItem(`RentaHome-wishlist-cache-${user._id}`)
+        localStorage.getItem(
+          `househunter-wishlist-cache-user-dashboard-${user._id}`
+        )
       );
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/wishlist/last-updated/user`, {
+        } = await axios.get(`${API_URL}/timestamp/favourite/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -83,12 +86,12 @@ export default function UserDasboard() {
           setLoading({ type: "wishlist", status: false });
           return;
         }
-        const { data } = await axios.get(`${API_URL}/wishlist/fetch/user`, {
+        const { data } = await axios.get(`${API_URL}/wishlist/fetch`, {
           withCredentials: true,
         });
         setWishlist(data);
         localStorage.setItem(
-          `RentaHome-wishlist-cache-${user._id}`,
+          `househunter-wishlist-cache-user-dashboard-${user._id}`,
           JSON.stringify({ data, lastUpdated })
         );
       } catch (err) {
@@ -101,12 +104,14 @@ export default function UserDasboard() {
     const fetchReviews = async () => {
       setLoading({ type: "reviews", status: true });
       const cached = JSON.parse(
-        localStorage.getItem(`RentaHome-reviews-cache-${user._id}`)
+        localStorage.getItem(
+          `househunter-reviews-cache-user-dashboard-${user._id}`
+        )
       );
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/reviews/last-updated/user`, {
+        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -119,7 +124,7 @@ export default function UserDasboard() {
         });
         setReviews(data);
         localStorage.setItem(
-          `RentaHome-reviews-cache-${user._id}`,
+          `househunter-reviews-cache-user-dashboard-${user._id}`,
           JSON.stringify({ data, lastUpdated })
         );
       } catch (err) {
@@ -128,24 +133,14 @@ export default function UserDasboard() {
         setLoading({ type: "reviews", status: false });
       }
     };
-
-    const hour = new Date().getHours();
-    let greet = "";
-    if (hour >= 0 && hour < 12) {
-      greet = "Good morning";
-    } else if (hour >= 12 && hour < 16) {
-      greet = "Good afternoon";
-    } else {
-      greet = "Good evening";
-    }
     fetchListings();
     fetchReviews();
     fetchWishlist();
   }, []);
   return (
     <>
-      <article className="flex flex-col lg:flex-row items-start gap-3">
-        <section className="flex flex-col gap-3 w-full">
+      <article className="flex flex-col lg:flex-row items-start gap-3 min-h-dvh">
+        <section className="flex flex-col gap-3 w-full h-full">
           <main className="w-full flex items-center gap-3">
             <article className="bg-white rounded-2xl p-4 w-full flex items-center justify-between">
               <main className="flex flex-col gap-1">
@@ -384,12 +379,19 @@ export default function UserDasboard() {
                         <SwiperSlide key={review._id}>
                           <Link
                             className="break-inside-avoid rounded-3xl border border-zinc-200/70 p-6 flex flex-col gap-3 bg-white"
-                            to={`/listing/${review.property._id}`}
+                            to={
+                              review.property
+                                ? `/listing/${review.property._id}`
+                                : "#"
+                            }
                           >
                             <div className="flex items-center gap-2">
                               <span className="h-12 w-12 shrink-0 rounded-full bg-zinc-100 relative">
                                 <img
-                                  src={review.property.images[0].url}
+                                  src={
+                                    review.property?.images?.[0]?.url ||
+                                    "/placeholder.jpg"
+                                  }
                                   alt={review.fullname}
                                   className="h-full w-full rounded-full object-cover"
                                 />
@@ -397,7 +399,8 @@ export default function UserDasboard() {
                               <section className="flex w-full justify-between">
                                 <div className="flex flex-col">
                                   <span className="text-xs font-semibold capitalize">
-                                    {review.property.title}
+                                    {review.property?.title ||
+                                      "Deleted Property"}
                                   </span>
                                   <p className="text-xs text-primary font-medium">
                                     {review.reviewType}
@@ -416,7 +419,7 @@ export default function UserDasboard() {
                                 </span>
                               ))}
                             </div>
-                            <p className="text-sm leading-tight font-medium">
+                            <p className="text-xs leading-tight font-medium">
                               {review.message}
                             </p>
                           </Link>
@@ -452,61 +455,74 @@ export default function UserDasboard() {
                 <IoEyeOutline /> View all
               </Link>
             </div>
-
-            <article className="flex flex-col divide-y divide-zinc-200">
-              {listings?.slice(0, 3).map((listing, index) => (
-                <Link
-                  to={`/listing/${listing._id}`}
-                  key={listing._id}
-                  className="flex flex-col gap-3 py-5"
-                >
-                  <article className="h-[130px] rounded-2xl">
-                    <img
-                      src={listing.images[0].url}
-                      className="h-full w-full rounded-2xl object-cover"
-                      alt={listing.title}
-                    />
+            {loading.type === "listing" && loading.status ? (
+              <Loader padding={10} />
+            ) : (
+              <>
+                {listings && listings.length ? (
+                  <article className="flex flex-col divide-y divide-zinc-200">
+                    {listings?.slice(0, 3).map((listing, index) => (
+                      <Link
+                        to={`/listing/${listing._id}`}
+                        key={listing._id}
+                        className="flex flex-col gap-3 py-5"
+                      >
+                        <article className="h-[130px] rounded-2xl">
+                          <img
+                            src={listing.images[0].url}
+                            className="h-full w-full rounded-2xl object-cover"
+                            alt={listing.title}
+                          />
+                        </article>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-blue-600">
+                            &#8358;{listing.price.toLocaleString()}
+                          </span>
+                          <div className="flex items-center gap-1 text-[11px] font-medium bg-zinc-100 px-2 py-0.5 rounded-full">
+                            <span className="h-1 w-1 rounded-full bg-blue-600"></span>
+                            {listing.purpose}
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[13px]">
+                            {listing.title}
+                          </span>
+                          <p className="text-xs text-zinc-500 flex items-center gap-1">
+                            <FaMapLocationDot />
+                            {`${listing.location.area}, ${listing.location.state}`}
+                          </p>
+                        </div>
+                        <article className="flex items-center gap-1 text-[11px] justify-between">
+                          <span className="flex items-center gap-1">
+                            <LuBed className="text-zinc-400" />
+                            {listing.bedrooms} Beds
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BiShower className="text-zinc-400" />
+                            {listing.bathrooms} Bathrooms
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <LuToilet className="text-zinc-400" />
+                            {listing.toilets} Toilets
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BiArea className="text-zinc-400" />
+                            {listing.areaSize}
+                            <TbMeterSquare className="-ml-1" />
+                          </span>
+                        </article>
+                      </Link>
+                    ))}
                   </article>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-blue-600">
-                      &#8358;{listing.price.toLocaleString()}
-                    </span>
-                    <div className="flex items-center gap-1 text-[11px] font-medium bg-zinc-100 px-2 py-0.5 rounded-full">
-                      <span className="h-1 w-1 rounded-full bg-blue-600"></span>
-                      {listing.purpose}
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-[13px]">
-                      {listing.title}
-                    </span>
-                    <p className="text-xs text-zinc-500 flex items-center gap-1">
-                      <FaMapLocationDot />
-                      {`${listing.location.area}, ${listing.location.state}`}
-                    </p>
-                  </div>
-                  <article className="flex items-center gap-1 text-[11px] justify-between">
-                    <span className="flex items-center gap-1">
-                      <LuBed className="text-zinc-400" />
-                      {listing.bedrooms} Beds
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BiShower className="text-zinc-400" />
-                      {listing.bathrooms} Bathrooms
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <LuToilet className="text-zinc-400" />
-                      {listing.toilets} Toilets
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BiArea className="text-zinc-400" />
-                      {listing.areaSize}
-                      <TbMeterSquare className="-ml-1" />
-                    </span>
-                  </article>
-                </Link>
-              ))}
-            </article>
+                ) : (
+                  <NoRecord
+                    margin={10}
+                    text={"No property currently listed"}
+                    fontSize={14}
+                  />
+                )}
+              </>
+            )}
           </article>
         </section>
       </article>

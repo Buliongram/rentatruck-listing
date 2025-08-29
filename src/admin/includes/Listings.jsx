@@ -22,7 +22,10 @@ export default function Listings({ listings, loading }) {
           </main>
           <CircularProgress
             percentage={
-              (Number(listings.length) / Number(listings?.length)) * 100 || 0
+              (
+                (Number(listings.length) / Number(listings?.length)) *
+                100
+              ).toFixed(1) || 0
             }
             color={"#155dfc"}
           />
@@ -37,7 +40,10 @@ export default function Listings({ listings, loading }) {
           </main>
           <CircularProgress
             percentage={
-              (Number(activeListings) / Number(listings?.length)) * 100 || 0
+              (
+                (Number(activeListings) / Number(listings?.length)) *
+                100
+              ).toFixed(1) || 0
             }
             color={"#007a55"}
           />
@@ -51,7 +57,10 @@ export default function Listings({ listings, loading }) {
           </main>
           <CircularProgress
             percentage={
-              (Number(pendingListing) / Number(listings?.length)) * 100 || 0
+              (
+                (Number(pendingListing) / Number(listings?.length)) *
+                100
+              ).toFixed(1) || 0
             }
             color={"#ff6900 "}
           />

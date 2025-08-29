@@ -13,6 +13,8 @@ import { TbMeterSquare } from "react-icons/tb";
 import Charts from "../includes/Charts";
 import Enquiries from "../includes/Enquiries";
 import toast from "react-hot-toast";
+import Loader from "../../components/Loader";
+import NoRecord from "../../components/NoRecord";
 
 export default function AdminDashboard() {
   const API_URL =
@@ -21,27 +23,29 @@ export default function AdminDashboard() {
       : `https://rentahome-server.onrender.com/api`;
   const user = useSelector((state) => state.user);
   const [greeting, setGreeting] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState({ type: "", status: false });
   const [listings, setListings] = useState([]);
   const [agents, setAgents] = useState([]);
   useEffect(() => {
     const fetchListings = async () => {
-      setLoading(true);
-      const cacheKey = `RentaHome-listing-cache-${user._id}`;
+      setFetching({ type: "listing", status: true });
+      const cacheKey = `househunter-listing-cache-dadmin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/listing/last-updated`);
+        } = await axios.get(`${API_URL}/timestamp/listing/updatedAt`, {
+          withCredentials: true,
+        });
 
         if (cached && cached.lastUpdated === lastUpdated) {
           setListings(cached.data);
-          setLoading(false);
+          setFetching({ type: "listing", status: false });
           return;
         }
 
-        const { data } = await axios.get(`${API_URL}/listing/fetch`, {
+        const { data } = await axios.get(`${API_URL}/listing/fetch/dashboard`, {
           withCredentials: true,
         });
         setListings(data);
@@ -49,33 +53,33 @@ export default function AdminDashboard() {
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false);
+        setFetching({ type: "listing", status: false });
       }
     };
     const fetchAgents = async () => {
-      const cached = JSON.parse(
-        localStorage.getItem(`RentaHome-agent-cache-${user._id}`)
-      );
+      setFetching({ type: "agent", status: true });
+      const cacheKey = `househunter-agent-cache-dadmin-dashboard-${user._id}`;
+      const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/agent/last-updated`, {
+        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
           setAgents(cached.data);
+          setFetching({ type: "agent", status: false });
           return;
         }
         const { data } = await axios.get(`${API_URL}/agent/fetch/order`, {
           withCredentials: true,
         });
         setAgents(data);
-        localStorage.setItem(
-          `RentaHome-agent-cache-${user._id}`,
-          JSON.stringify({ data, lastUpdated })
-        );
+        localStorage.setItem(cacheKey, JSON.stringify({ data, lastUpdated }));
       } catch (err) {
-        toast.error("Failed to fetch agents.");
+        toast.error("Failed to fetch agents.", { id: "123" });
+      } finally {
+        setFetching({ type: "listing", status: false });
       }
     };
     fetchAgents();
@@ -97,9 +101,15 @@ export default function AdminDashboard() {
       {" "}
       <article className="flex flex-col lg:flex-row items-start gap-3">
         <article className="flex flex-col gap-3 w-full">
-          <Listings loading={loading} listings={listings} />
-          <Charts agents={agents} />
-          <Enquiries listings={listings} agents={agents} />
+          <Listings
+            loading={fetching.type === "listing" && fetching.status}
+            listings={listings}
+          />
+          <Charts
+            fetching={fetching.type === "agent" && fetching.status}
+            agents={agents}
+          />
+          <Enquiries fetching={fetching} listings={listings} agents={agents} />
         </article>
         <section className="w-full max-w-[320px] shrink-0 flex flex-col gap-5 ">
           <div className="flex flex-col gap-5 rounded-3xl p-6 relative">
@@ -130,60 +140,70 @@ export default function AdminDashboard() {
               </Link>
             </div>
 
-            <article className="flex flex-col divide-y divide-zinc-200">
-              {listings?.slice(0, 3).map((listing, index) => (
-                <Link
-                  to={`/listing/${listing._id}`}
-                  key={listing._id}
-                  className="flex flex-col gap-3 py-5"
-                >
-                  <article className="h-[130px] rounded-2xl">
-                    <img
-                      src={listing.images[0].url}
-                      className="h-full w-full rounded-2xl object-cover"
-                      alt={listing.title}
-                    />
+            {fetching.type === "listing" && fetching.status ? (
+              <Loader padding={5} text={"Fetching Properties"} />
+            ) : (
+              <>
+                {listings && listings.length ? (
+                  <article className="flex flex-col divide-y divide-zinc-200">
+                    {listings?.slice(0, 3).map((listing, index) => (
+                      <Link
+                        to={`/listing/${listing._id}`}
+                        key={listing._id}
+                        className="flex flex-col gap-3 py-5"
+                      >
+                        <article className="h-[130px] rounded-2xl">
+                          <img
+                            src={listing.images[0].url}
+                            className="h-full w-full rounded-2xl object-cover"
+                            alt={listing.title}
+                          />
+                        </article>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-blue-600">
+                            &#8358;{listing.price.toLocaleString()}
+                          </span>
+                          <div className="flex items-center gap-1 text-[11px] font-medium bg-zinc-100 px-2 py-0.5 rounded-full">
+                            <span className="h-1 w-1 rounded-full bg-blue-600"></span>
+                            {listing.purpose}
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[13px]">
+                            {listing.title}
+                          </span>
+                          <p className="text-xs text-zinc-500 flex items-center gap-1">
+                            <FaMapLocationDot />
+                            {`${listing.location.area}, ${listing.location.state}`}
+                          </p>
+                        </div>
+                        <article className="flex items-center gap-1 text-[11px] justify-between">
+                          <span className="flex items-center gap-1">
+                            <LuBed className="text-zinc-400" />
+                            {listing.bedrooms} Beds
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BiShower className="text-zinc-400" />
+                            {listing.bathrooms} Bathrooms
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <LuToilet className="text-zinc-400" />
+                            {listing.toilets} Toilets
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <BiArea className="text-zinc-400" />
+                            {listing.areaSize}
+                            <TbMeterSquare className="-ml-1" />
+                          </span>
+                        </article>
+                      </Link>
+                    ))}
                   </article>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-blue-600">
-                      &#8358;{listing.price.toLocaleString()}
-                    </span>
-                    <div className="flex items-center gap-1 text-[11px] font-medium bg-zinc-100 px-2 py-0.5 rounded-full">
-                      <span className="h-1 w-1 rounded-full bg-blue-600"></span>
-                      {listing.purpose}
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-[13px]">
-                      {listing.title}
-                    </span>
-                    <p className="text-xs text-zinc-500 flex items-center gap-1">
-                      <FaMapLocationDot />
-                      {`${listing.location.area}, ${listing.location.state}`}
-                    </p>
-                  </div>
-                  <article className="flex items-center gap-1 text-[11px] justify-between">
-                    <span className="flex items-center gap-1">
-                      <LuBed className="text-zinc-400" />
-                      {listing.bedrooms} Beds
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BiShower className="text-zinc-400" />
-                      {listing.bathrooms} Bathrooms
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <LuToilet className="text-zinc-400" />
-                      {listing.toilets} Toilets
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BiArea className="text-zinc-400" />
-                      {listing.areaSize}
-                      <TbMeterSquare className="-ml-1" />
-                    </span>
-                  </article>
-                </Link>
-              ))}
-            </article>
+                ) : (
+                  <NoRecord text={"No properties found"} fontSize={12} />
+                )}
+              </>
+            )}
           </article>
 
           <div className="flex flex-col gap-5 rounded-3xl p-3 relative border items-center">

@@ -218,7 +218,7 @@ export default function Header() {
                 className="flex items-center gap-2 bg-white text-primary p-1 rounded-full pl-4"
               >
                 Sign up{" "}
-                <span className="h-7 w-7 rounded-full bg-black text-white flex items-center justify-center">
+                <span className="h-7 w-7 rounded-full bg-primary text-white flex items-center justify-center">
                   <BsArrowRight />
                 </span>
               </Link>

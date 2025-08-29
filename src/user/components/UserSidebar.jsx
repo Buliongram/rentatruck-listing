@@ -2,15 +2,13 @@ import React from "react";
 import { BiMessageSquareDetail, BiSupport, BiUser } from "react-icons/bi";
 import { FaCrown, FaMagento, FaRegHeart } from "react-icons/fa6";
 import { GoShield } from "react-icons/go";
-import { HiOutlineHomeModern } from "react-icons/hi2";
 import { IoGridOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 import { MdOutlineReviews } from "react-icons/md";
-import { useSelector } from "react-redux";
 import { LuHouse } from "react-icons/lu";
 import { bluebg } from "../../assets/images/images";
 
-export default function PanelSidebar() {
+export default function UserSidebar() {
   const location = useLocation();
   const navLinks = [
     {
@@ -20,13 +18,13 @@ export default function PanelSidebar() {
       icon: <IoGridOutline />,
       user: true,
     },
-    {
-      id: "2",
-      name: "Messages",
-      path: "/dashboard/messages",
-      icon: <BiMessageSquareDetail />,
-      user: true,
-    },
+    // {
+    //   id: "2",
+    //   name: "Messages",
+    //   path: "/dashboard/messages",
+    //   icon: <BiMessageSquareDetail />,
+    //   user: true,
+    // },
     {
       id: "66",
       name: "Listings",
@@ -90,14 +88,14 @@ export default function PanelSidebar() {
   return (
     <>
       <section className="fixed w-[200px] bg-white top-0 left-0 h-full flex flex-col justify-between p-4 py-6 items-center">
-        {/* <div className="flex items-center gap-1 text-sm pb-4 border-b border-zinc-200">
-          <span className="h-7 w-7 rounded-lg bg-blue-600 text-white flex items-center justify-center">
-            <HiOutlineHomeModern />
+        <Link to={"/"} className="flex items-center gap-1">
+          <span className="h-8 w-8 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center">
+            <FaMagento />
           </span>
-          <span className="text-[16px] font-semibold text-emerald-9bg-blue-600">
-            RentaHome
-          </span>
-        </div> */}
+          <div className="text-lg font-semibold text-blue-600 font-primary mt-1">
+            HouseHunter
+          </div>
+        </Link>
 
         <section className="flex flex-col w-full gap-1">
           {renderLinks()}
