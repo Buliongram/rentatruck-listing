@@ -23,6 +23,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import Loader from "../../components/Loader";
+import { cache } from "react";
 export default function UserDasboard() {
   const API_URL =
     window.location.hostname === "localhost"
@@ -41,21 +42,23 @@ export default function UserDasboard() {
           `househunter-listing-cache-user-dashboard-${user._id}`
         )
       );
-
       try {
         const {
           data: { lastUpdated },
         } = await axios.get(`${API_URL}/timestamp/listing/updatedAt`);
-
         if (cached && cached.lastUpdated === lastUpdated) {
           setListings(cached.data);
           setLoading({ type: "listing", status: false });
           return;
         }
 
-        const { data } = await axios.get(`${API_URL}/listing/fetch`, {
-          withCredentials: true,
-        });
+        const { data: fetchedData } = await axios.get(
+          `${API_URL}/listing/fetch/dashboard`,
+          { withCredentials: true }
+        );
+        const data = fetchedData.filter(
+          (listing) => listing.status === "active"
+        );
         setListings(data);
         localStorage.setItem(
           `househunter-listing-cache-user-dashboard-${user._id}`,
@@ -111,7 +114,7 @@ export default function UserDasboard() {
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
+        } = await axios.get(`${API_URL}/timestamp/review/updatedAt`, {
           withCredentials: true,
         });
         if (cached && cached.lastUpdated === lastUpdated) {
@@ -119,9 +122,12 @@ export default function UserDasboard() {
           setLoading({ type: "reviews", status: false });
           return;
         }
-        const { data } = await axios.get(`${API_URL}/reviews/fetch/user`, {
+        const { data:fetchedReviews } = await axios.get(`${API_URL}/reviews/fetch/user`, {
           withCredentials: true,
         });
+        const data = fetchedReviews.filter(
+          (review) => review.status === "published"
+        );
         setReviews(data);
         localStorage.setItem(
           `househunter-reviews-cache-user-dashboard-${user._id}`,
@@ -459,17 +465,21 @@ export default function UserDasboard() {
               <Loader padding={10} />
             ) : (
               <>
-                {listings && listings.length ? (
+                {listings && listings.length > 0 ? (
                   <article className="flex flex-col divide-y divide-zinc-200">
                     {listings?.slice(0, 3).map((listing, index) => (
                       <Link
                         to={`/listing/${listing._id}`}
                         key={listing._id}
-                        className="flex flex-col gap-3 py-5"
+                        className="flex flex-col gap-3 mt-5 pb-5 relative"
                       >
+                        {" "}
+                        <div className="absolute top-3 left-3 bg-orange-600 text-white rounded-lg text-[10px] font-semibold px-3 py-1">
+                          {listing.category || "House"}
+                        </div>
                         <article className="h-[130px] rounded-2xl">
                           <img
-                            src={listing.images[0].url}
+                            src={listing?.images[0]?.url || ""}
                             className="h-full w-full rounded-2xl object-cover"
                             alt={listing.title}
                           />

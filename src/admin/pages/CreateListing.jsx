@@ -175,7 +175,7 @@ export default function CreateListing() {
     try {
       const formDataPayload = new FormData();
 
-      // Loop through all form data fields
+
       for (const key in formData) {
         if (key === "images" || key === "streetAddress") {
           continue;
@@ -266,7 +266,7 @@ export default function CreateListing() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-5 w-full lg:p-14 p-4"
+      className="flex flex-col gap-5 w-full p-4"
       encType="multipart/form-data"
     >
       {/* All the existing JSX elements go here */}

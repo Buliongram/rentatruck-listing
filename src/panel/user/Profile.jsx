@@ -37,8 +37,8 @@ export default function Profile() {
                   alt="Profile"
                   className="h-full w-full rounded-full object-cover"
                 />
-              ) : user.firstname && user.lastname ? (
-                `${user.firstname[0] + user.lastname[0]}`
+              ) : (user.firstname && user.lastname) || "" ? (
+                `${user.firstname[0] + user.lastname[0] || ""}`
               ) : (
                 "R"
               )}
@@ -63,10 +63,10 @@ export default function Profile() {
 
             <div className="flex flex-col gap-0.5">
               <span className="font-medium capitalize text-sm">
-                {`${user.firstname} ${user.lastname}`}
+                {`${user.firstname} ${user.lastname || ""}`}
               </span>
               <p className="text-xs font-medium text-zinc-500">
-                RentaHome {user.type}
+                HouseHunter {user.type}
               </p>
               <p className="text-xs  text-zinc-400">
                 S7irr2oo7b62koaw21yy5ytta42f779vb63r5
@@ -99,7 +99,7 @@ export default function Profile() {
 
           <main className="flex flex-col gap-1 w-full">
             <p className=" text-zinc-500">Last Name</p>
-            <p className=" font-medium capitalize">{user.lastname}</p>
+            <p className=" font-medium capitalize">{user.lastname || ""}</p>
           </main>
 
           <main className="w-full"></main>

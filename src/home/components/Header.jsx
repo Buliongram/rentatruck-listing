@@ -159,7 +159,7 @@ export default function Header() {
           <span className="h-8 w-8 rounded-lg text-lg bg-white text-primary flex items-center justify-center">
             <FaMagento />
           </span>
-          <div className="text-xl font-medium text-white">RentaHome</div>
+          <div className="text-xl font-medium text-white">HouseHunter</div>
         </Link>
 
         <main className="hidden lg:flex items-center gap-6 text-sm font-medium">

@@ -157,7 +157,20 @@ export default function AdminUsers() {
         clearToggleEdit();
       }
     } catch (error) {
-      toast.error("Failed to update user details.", { id: "detailsEdit" });
+      console.log(error);
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "detailsEdit",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "detailsEdit",
+        });
+      }
     }
   };
 
@@ -186,7 +199,19 @@ export default function AdminUsers() {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to delete user.", { id: "deleteToast" });
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "deleteToast",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "deleteToast",
+        });
+      }
     }
   };
 
@@ -201,10 +226,10 @@ export default function AdminUsers() {
     <>
       <article className="flex flex-col gap-5">
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
-          <span className="text-2xl font-semibold pb-6">
+          <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
             Users{" "}
-            <span className="text-sm font-medium text-zinc-500">
-              ({users.length})
+            <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+              {users.length}
             </span>
           </span>
           <section className="flex items-center justify-between pt-4">
@@ -253,10 +278,13 @@ export default function AdminUsers() {
                 <tr key={user._id}>
                   <td>{format(parseISO(user.createdAt), "E, d MMMM yyyy")}</td>
                   <td className="capitalize">
-                    {user.firstname} {user.middlename} {user.lastname}
+                    {user.firstname} {user.middlename || ""}{" "}
+                    {user.lastname || ""}
                   </td>
                   <td className="text-blue-600">
-                    <a href={`tel:+${user.number}`}>+{user.number}</a>
+                    <a href={`tel:${user.number}`}>
+                      {user.number || "Not added yet"}
+                    </a>
                   </td>
                   <td>
                     <a className="underline" href={`mailto:${user.email}`}>
@@ -308,7 +336,7 @@ export default function AdminUsers() {
                           setToggleEdit({
                             modal: true,
                             firstname: user.firstname,
-                            lastname: user.lastname,
+                            lastname: user.lastname || "",
                             middlename: user.middlename,
                             email: user.email,
                             number: user.number,
@@ -394,9 +422,9 @@ export default function AdminUsers() {
                 </span>
                 <input
                   type="text"
-                  required
                   name="lastname"
                   value={toggleEdit.lastname}
+                  required
                   onChange={handleChange}
                   className="bg-zinc-50 border border-zinc-200 w-full rounded-xl p-3 px-4 text-xs font-medium placeholder:text-xs placeholder:text-zinc-400 placeholder:font-normal outline-zinc-200"
                   placeholder="Enter last name"
@@ -411,8 +439,8 @@ export default function AdminUsers() {
                 </span>
                 <input
                   type="text"
-                  required
                   name="number"
+                  required
                   value={toggleEdit.number}
                   onChange={handleChange}
                   className="bg-zinc-50 border border-zinc-200 w-full rounded-xl p-3 px-4 text-xs font-medium placeholder:text-xs placeholder:text-zinc-400 placeholder:font-normal outline-zinc-200"

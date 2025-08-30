@@ -18,7 +18,7 @@ export const useSettings = () => {
 
   const [name, setName] = useState({
     firstname: user.firstname,
-    lastname: user.lastname,
+    lastname: user.lastname || "",
     email: user.email,
   });
   const [email, setEmail] = useState({ email: user.email });
@@ -48,7 +48,7 @@ export const useSettings = () => {
         updateUser({
           ...user,
           firstname: data.firstname,
-          lastname: data.lastname,
+          lastname: data.lastname || "",
         })
       );
       navigate(0);

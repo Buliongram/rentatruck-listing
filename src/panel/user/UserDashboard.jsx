@@ -37,7 +37,7 @@ export default function UserDashboard() {
     setGreeting(greet);
     const fetchReviews = async () => {
       setLoading(true);
-      const cacheKey = `RentaHome-reviews-cache-${user._id}`;
+      const cacheKey = `househunter-reviews-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {
@@ -73,7 +73,7 @@ export default function UserDashboard() {
     };
     const fetchWishlist = async () => {
       setLoading(true);
-      const cacheKey = `RentaHome-wishlist-cache-${user._id}`;
+      const cacheKey = `househunter-wishlist-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {
@@ -109,7 +109,7 @@ export default function UserDashboard() {
     };
     const fetchListings = async () => {
       setLoading(true);
-      const cacheKey = `RentaHome-reviews-cache-${user._id}`;
+      const cacheKey = `househunter-reviews-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {
@@ -124,7 +124,7 @@ export default function UserDashboard() {
         }
 
         const { data } = await axios.post(
-          `${API_URL}/listing/fetch`,
+          `${API_URL}/listing/fetch/dashboard`,
           { userId: user._id },
           { withCredentials: true }
         );

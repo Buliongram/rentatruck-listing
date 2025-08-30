@@ -51,7 +51,9 @@ export default function Settings() {
               <section className="flex w-full items-center justify-between text-xs py-4">
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold">Full Name</span>
-                  <p className="text-xs text-zinc-500/90 capitalize font-normal">{`${user.firstname} ${user.lastname}`}</p>
+                  <p className="text-xs text-zinc-500/90 capitalize font-normal">{`${
+                    user.firstname
+                  } ${user.lastname || ""}`}</p>
                 </div>
                 <p
                   className="text-xs font-medium cursor-pointer flex items-center gap-2 border rounded-full border-zinc-200 py-1.5 px-3 text-zinc-500/80"
@@ -360,7 +362,7 @@ export default function Settings() {
                 <span className="text-sm font-medium">Delete account</span>
                 <p className="text-xs text-zinc-500/90 font-normal">
                   This will delete your account. Your account will be
-                  permanently deleted from RentaHome
+                  permanently deleted from HouseHunter
                 </p>
               </div>
               <p

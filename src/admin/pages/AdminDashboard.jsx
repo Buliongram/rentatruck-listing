@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchListings = async () => {
       setFetching({ type: "listing", status: true });
-      const cacheKey = `househunter-listing-cache-dadmin-dashboard-${user._id}`;
+      const cacheKey = `househunter-listing-cache-admin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
     };
     const fetchAgents = async () => {
       setFetching({ type: "agent", status: true });
-      const cacheKey = `househunter-agent-cache-dadmin-dashboard-${user._id}`;
+      const cacheKey = `househunter-agent-cache-admin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
@@ -98,7 +98,6 @@ export default function AdminDashboard() {
 
   return (
     <>
-      {" "}
       <article className="flex flex-col lg:flex-row items-start gap-3">
         <article className="flex flex-col gap-3 w-full">
           <Listings
@@ -150,7 +149,7 @@ export default function AdminDashboard() {
                       <Link
                         to={`/listing/${listing._id}`}
                         key={listing._id}
-                        className="flex flex-col gap-3 py-5"
+                        className="flex flex-col gap-3 mt-5 pb-5 relative"
                       >
                         <article className="h-[130px] rounded-2xl">
                           <img
@@ -159,6 +158,19 @@ export default function AdminDashboard() {
                             alt={listing.title}
                           />
                         </article>
+                        <span
+                          className={`px-2 py-0.5 rounded-lg capitalize text-[11px] text-white absolute top-2 left-2 ${
+                            {
+                              active: "bg-green-500",
+                              archived: "bg-gray-500",
+                              sold: "bg-red-500",
+                              rented: "bg-blue-500",
+                              pending: "bg-amber-400",
+                            }[listing.status] || "bg-gray-300"
+                          }`}
+                        >
+                          {listing.status}
+                        </span>
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-blue-600">
                             &#8358;{listing.price.toLocaleString()}

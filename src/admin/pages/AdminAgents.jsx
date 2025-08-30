@@ -162,7 +162,20 @@ export default function AdminAgents() {
         clearToggleEdit();
       }
     } catch (error) {
-      toast.error("Failed to update agent details.", { id: "detailsEdit" });
+      console.log(error);
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "detailsEdit",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "detailsEdit",
+        });
+      }
     }
   };
 
@@ -191,7 +204,19 @@ export default function AdminAgents() {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to delete agent.", { id: "deleteToast" });
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "deleteToast",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "deleteToast",
+        });
+      }
     }
   };
 
@@ -206,10 +231,10 @@ export default function AdminAgents() {
     <>
       <article className="flex flex-col gap-5">
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
-          <span className="text-2xl font-semibold pb-6">
+          <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
             Agents{" "}
-            <span className="text-sm font-medium text-zinc-500">
-              ({agents.length})
+            <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+              {agents.length}
             </span>
           </span>
           <section className="flex items-center justify-between pt-4">
@@ -258,10 +283,13 @@ export default function AdminAgents() {
                 <tr key={agent._id}>
                   <td>{format(parseISO(agent.createdAt), "E, d MMMM yyyy")}</td>
                   <td className="capitalize">
-                    {agent.firstname} {agent.middlename} {agent.lastname}
+                    {agent.firstname} {agent.middlename || ""}{" "}
+                    {agent.lastname || ""}
                   </td>
                   <td className="text-blue-600">
-                    <a href={`tel:+${agent.number}`}>+{agent.number}</a>
+                    <a href={`tel:${agent.number}`}>
+                      {agent.number || "Not added yet"}
+                    </a>
                   </td>
                   <td>
                     <a className="underline" href={`mailto:${agent.email}`}>
@@ -325,7 +353,7 @@ export default function AdminAgents() {
                           setToggleEdit({
                             modal: true,
                             firstname: agent.firstname,
-                            lastname: agent.lastname,
+                            lastname: agent.lastname || "",
                             middlename: agent.middlename,
                             email: agent.email,
                             number: agent.number,

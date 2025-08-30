@@ -41,7 +41,7 @@ export default function Enquiries({ listings, agents, fetching }) {
   useEffect(() => {
     const fetchEnquiries = async () => {
       setLoading({ type: "enquiry", status: true });
-      const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
+      const cacheKey = `househunter-enquiry-cache-admin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
@@ -67,7 +67,7 @@ export default function Enquiries({ listings, agents, fetching }) {
     };
     const fetchUsers = async () => {
       setLoading({ type: "user", status: true });
-      const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
+      const cacheKey = `househunter-enquiry-cache-admin-dashboard-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
@@ -84,7 +84,7 @@ export default function Enquiries({ listings, agents, fetching }) {
         });
         setUsers(data);
         localStorage.setItem(
-          `househunter-user-cache-dadmin-dashboard-${user._id}`,
+          `househunter-user-cache-admin-dashboard-${user._id}`,
           JSON.stringify({ data, lastUpdated })
         );
       } catch (err) {
@@ -156,7 +156,7 @@ export default function Enquiries({ listings, agents, fetching }) {
     enquiries?.filter((prop) => prop.medium == "message").length || 0;
   return (
     <>
-      <section className="w-full flex items-center gap-4">
+      <section className="w-full flex items-center gap-2">
         <article className="bg-white rounded-2xl p-4 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
             <p className="text-xs text-zinc-500">Total Enquiries</p>
@@ -302,7 +302,7 @@ export default function Enquiries({ listings, agents, fetching }) {
         )}
       </main>
 
-      <section className="w-full flex gap-4">
+      <section className="w-full flex gap-2">
         <article className="p-6 rounded-3xl flex flex-col items-center justify-center w-full max-h-[350px] gap-4 bg-white">
           <PolarArea data={data} options={options} />
         </article>

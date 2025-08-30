@@ -234,13 +234,15 @@ export default function Login() {
               <span className="h-8 w-8 rounded-lg text-lg bg-primary text-white flex items-center justify-center">
                 <FaMagento />
               </span>
-              <div className="text-xl font-medium text-primary">RentaHome</div>
+              <div className="text-xl font-medium text-primary">
+                HouseHunter
+              </div>
             </Link>
 
             {toggleLoginForm && !tokenActive ? (
               <>
                 <h1 className="font-semibold text-2xl tracking-tight">
-                  Welcome Back to RentaHome!
+                  Welcome Back to HouseHunter!
                 </h1>
 
                 <main className="flex flex-col items-center gap-6 w-full ">
@@ -348,7 +350,7 @@ export default function Login() {
                   </main>
 
                   <p className="text-xs text-zinc-500 font-medium flex items-center gap-1">
-                    By continuing, you agree to RentaHome's
+                    By continuing, you agree to HouseHunter's
                     <Link to={"/privacy-policy"} className="underline">
                       Privacy Policy
                     </Link>

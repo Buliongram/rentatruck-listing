@@ -99,10 +99,10 @@ export default function Support() {
             <h3 className="text-[11px] ">
               Reach us at{" "}
               <a
-                href="mailto:info@rentahome.com"
+                href="mailto:info@househunter.com"
                 className="font-semibold underline text-blue-600"
               >
-                info@rentahome.com
+                info@househunter.com
               </a>
             </h3>
           </section>

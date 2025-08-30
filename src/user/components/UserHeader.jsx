@@ -48,7 +48,7 @@ export default function UserHeader() {
             </span>
             <div className="flex flex-col">
               <span className="text-xs font-semibold">
-                {`${user.firstname} ${user.lastname}`}
+                {`${user.firstname} ${user.lastname || ""}`}
               </span>
               <p className="text-[10px] text-zinc-500">{user.role}</p>
             </div>

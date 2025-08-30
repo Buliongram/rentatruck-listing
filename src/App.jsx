@@ -36,6 +36,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./assets/store/userSlice";
 import axios from "axios";
 
+
+
+
+const AdminSidebar = lazy(() => import("./admin/components/AdminSidebar"));
+const CreateBlog = lazy(() => import("./admin/pages/CreateBlog"));
 const AgentDashboard = lazy(() => import("./agent/pages/AgentDashboard"));
 const AgentHeader = lazy(() => import("./agent/components/AgentHeader"));
 const AgentSidebar = lazy(() => import("./agent/components/AgentSidebar"));
@@ -49,11 +54,14 @@ const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const AdminListings = lazy(() => import("./admin/pages/AdminListings"));
 const AdminUsers = lazy(() => import("./admin/pages/AdminUsers"));
 const AdminAgents = lazy(() => import("./admin/pages/AdminAgents"));
-const AdminOwners = lazy(() => import("./admin/pages/AdminOwners"));
+const AdminContacts = lazy(() => import("./admin/pages/AdminContacts"));
+const AdminBlogs = lazy(() => import("./admin/pages/AdminBlogs"));
+const AdminReviews = lazy(() => import("./admin/pages/AdminReviews"));
 
 const UserHeader = lazy(() => import("./user/components/UserHeader"));
 const UserSidebar = lazy(() => import("./user/components/UserSidebar"));
 const UserDashboard = lazy(() => import("./user/pages/UserDasboard"));
+const SavedItems = lazy(() => import("./user/pages/SavedItems"));
 
 const Settings = lazy(() => import("./panel/user/Settings"));
 const Profile = lazy(() => import("./panel/user/Profile"));
@@ -157,8 +165,8 @@ export default function App() {
 
     return (
       <Suspense fallback={<Preloader />}>
-        {/* <AdminSidebar /> */}
-        <section className=" bg-zinc-100/60 p-4 ">
+        <AdminSidebar />
+        <section className="lg:ml-[200px] bg-zinc-100/60 p-4">
           <AdminHeader />
           <main className="mt-4 ">
             <Outlet />
@@ -231,7 +239,7 @@ export default function App() {
       children: [
         { path: "/dashboard", element: <UserDashboard /> },
         { path: "/dashboard/messages", element: <Messages /> },
-        { path: "/dashboard/saved-items", element: <Wishlist /> },
+        { path: "/dashboard/saved-items", element: <SavedItems /> },
         { path: "/dashboard/reviews", element: <DashboadReviews /> },
         { path: "/dashboard/support", element: <Support /> },
         { path: "/dashboard/profile", element: <Profile /> },
@@ -246,18 +254,20 @@ export default function App() {
         { path: "/admin", element: <AdminDashboard /> },
         { path: "/admin/messages", element: <Messages /> },
         { path: "/admin/saved-items", element: <Wishlist /> },
-        { path: "/admin/reviews", element: <DashboadReviews /> },
         { path: "/admin/support", element: <Support /> },
         { path: "/admin/profile", element: <Profile /> },
         { path: "/admin/security", element: <Settings /> },
         { path: "/admin/enquiries", element: <AdminLeads /> },
         { path: "/admin/statistics", element: <AdminStatistics /> },
         { path: "/admin/create/listing", element: <CreateListing /> },
-        { path: "/admin/listing/edit", element: <EditListing /> },
+        { path: "/admin/blog/create", element: <CreateBlog /> },
+        { path: "/admin/listing/edit/:id", element: <EditListing /> },
         { path: "/admin/listings", element: <AdminListings /> },
         { path: "/admin/users", element: <AdminUsers /> },
         { path: "/admin/agents", element: <AdminAgents /> },
-        { path: "/admin/owners", element: <AdminOwners /> },
+        { path: "/admin/blogs", element: <AdminBlogs /> },
+        { path: "/admin/contacts", element: <AdminContacts /> },
+        { path: "/admin/reviews", element: <AdminReviews /> },
       ],
     },
     {

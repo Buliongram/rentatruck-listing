@@ -32,7 +32,7 @@ export default function AdminLeads() {
     modal: false,
     message: "",
   });
-  const cacheKey = `househunter-enquiry-cache-dadmin-dashboard-${user._id}`;
+  const cacheKey = `househunter-enquiry-cache-admin-dashboard-${user._id}`;
   const [enquiries, setEnquiries] = useState([]);
   const [filteredEnquiries, setFilteredEnquiries] = useState([]);
 
@@ -114,9 +114,22 @@ export default function AdminLeads() {
         setToggleDelete(false);
         setEnquiryToDelete(null);
       }
-    } catch (error) {
-      toast.error("Failed to delete enquiry.", { id: "deleteToast" });
-    }
+    }  catch (error) {
+          console.log(error);
+          if (error.response?.data) {
+            toast.error(
+              error.response.data.message ||
+                "Unable to process your request. Please try again",
+              {
+                id: "deleteToast",
+              }
+            );
+          } else {
+            toast.error("An unknown error occured. Please try again.", {
+              id: "deleteToast",
+            });
+          }
+        }
   };
 
   const handleMarkAsRead = async (enquiryId) => {
@@ -148,10 +161,10 @@ export default function AdminLeads() {
     <>
       <article className="flex flex-col gap-5">
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
-          <span className="text-2xl font-semibold pb-6">
+          <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
             Enquiries{" "}
-            <span className="text-sm font-medium text-zinc-500">
-              ({enquiries.length})
+            <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+              {enquiries.length}
             </span>
           </span>
           <section className="flex items-center justify-between pt-4">

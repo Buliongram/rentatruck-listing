@@ -12,7 +12,6 @@ import {
 } from "react-icons/io5";
 import NoRecord from "../../components/NoRecord";
 import { MdReviews } from "react-icons/md";
-
 import { LuBed, LuChevronLeft, LuChevronRight, LuToilet } from "react-icons/lu";
 import {
   BiArea,
@@ -84,7 +83,7 @@ export default function SingleListing() {
         setEnquiryInput((prev) => ({
           ...prev,
           message: `Hello ${data.agent.firstname} ${
-            data.agent.lastname
+            data.agent.lastname || ""
           }, I'd like to check the availability for ${data.listing.title}, ${
             data.listing.location.state
           }, ₦${data.listing.price.toLocaleString()}. Thank you!`,
@@ -190,7 +189,17 @@ export default function SingleListing() {
         toast.error(res.data.message, { id: toastId });
       } else {
         toast.success(res.data.message, { id: toastId });
-        setEnquiryInput({ name: "", email: "", number: "", message: "" });
+        setEnquiryInput({
+          name: "",
+          email: "",
+          number: "",
+          message: "",
+          medium: `Hello ${agent.firstname} ${
+            agent.lastname || ""
+          }, I'd like to check the availability for ${listing.title}, ${
+            listing.location.state
+          }, ₦${listing.price.toLocaleString()}. Thank you!`,
+        });
       }
     } catch (error) {
       const errorMessage =
@@ -204,9 +213,13 @@ export default function SingleListing() {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    setLoadingReviews(true);
-    const toastId = toast.loading("Submitting your reviews...");
 
+    if (reviewInput.rating < 1) {
+      toast.error("Please select a rating", { id: "123" });
+      return;
+    }
+    setLoadingReviews(true);
+    toast.loading("Submitting your reviews...", { id: "123" });
     try {
       const res = await axios.post(
         `${API_URL}/reviews/store`,
@@ -215,24 +228,36 @@ export default function SingleListing() {
           withCredentials: true,
         }
       );
-
       if (res.data.error) {
-        toast.error(res.data.message, { id: toastId });
+        toast.error(res.data.message, { id: "123" });
       } else {
-        toast.success(res.data.message, { id: toastId });
+        toast.success(res.data.message, { id: "123" });
         setReviewInput({
           fullname: "",
           email: "",
           message: "",
-          rating: "",
+          reviewType: "listing",
+          property: "",
+          agent: "",
+          rating: 0,
           user: user ? user._id : "",
         });
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "An unknown error occurred. Please try again.";
-      toast.error(errorMessage, { id: toastId });
+      console.log(error);
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "123",
+          }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "123",
+        });
+      }
     } finally {
       setLoadingReviews(false);
     }
@@ -301,7 +326,7 @@ export default function SingleListing() {
                 <section className="flex items-center gap-3">
                   <main className="flex items-center gap-1">
                     <IoStarOutline />
-                    {listing.averageRating.toFixed(1)}
+                    {listing.averageRating}
                   </main>
                   <main className="flex items-center gap-1">
                     <IoEyeOutline /> {listing.views}
@@ -373,7 +398,9 @@ export default function SingleListing() {
                         <section className="flex w-full justify-between">
                           <div className="flex flex-col">
                             <span className="text-xs font-semibold capitalize">
-                              {`${review.user.firstname} ${review.user.lastname}`}
+                              {`${review.user.firstname} ${
+                                review.user.lastname || ""
+                              }`}
                             </span>
                             <p className="text-[10px] text-primary font-medium">
                               HouseHunter {review.user.role}
@@ -468,7 +495,7 @@ export default function SingleListing() {
                 />
               </span>
               <span className="text-[16px] font-semibold">
-                {`${agent.firstname} ${agent.lastname}`}
+                {`${agent.firstname} ${agent.lastname || ""}`}
               </span>
             </main>
             <main className="text-[11px] text-center text-zinc-500 font-normal leading-tight">
@@ -572,7 +599,7 @@ export default function SingleListing() {
                   href={`https://wa.me/2348012345678?text=Hello ${
                     agent.firstname
                   } ${
-                    agent.lastname
+                    agent.lastname || ""
                   }, I would like to check the availability for ${
                     listing?.title
                   }, ${
@@ -685,7 +712,7 @@ export default function SingleListing() {
                   onChange={handleReviewInputChange}
                   required
                   type="text"
-                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
                   placeholder="Enter full name"
                 />
               </main>
@@ -699,7 +726,7 @@ export default function SingleListing() {
                   required
                   name="email"
                   type="email"
-                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-sm outline-zinc-200"
+                  className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
                   placeholder="Enter email address"
                 />
               </main>
@@ -714,7 +741,7 @@ export default function SingleListing() {
                   name="message"
                   id="message"
                   rows={4}
-                  maxLength={500}
+                  maxLength={300}
                   className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
                   placeholder="Enter your message"
                   value={reviewInput.message}

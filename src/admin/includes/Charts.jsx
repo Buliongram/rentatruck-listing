@@ -29,7 +29,9 @@ export default function Charts({ agents, fetching }) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_URL}/statistics/listings-by-month`);
+        const res = await axios.get(`${API_URL}/statistics/listings-by-month`, {
+          withCredentials: true,
+        });
 
         const now = new Date();
         const months = [];
@@ -112,9 +114,11 @@ export default function Charts({ agents, fetching }) {
                         <div className="flex flex-col">
                           <span className="text-xs font-semibold capitalize">{`${
                             agent.firstname
-                          } ${agent.middlename || ""} ${agent.lastname}`}</span>
+                          } ${agent.middlename || ""} ${
+                            agent.lastname || ""
+                          }`}</span>
                           <p className="text-[10px] text-zinc-500">
-                            {agent.email}
+                            {agent.country}
                           </p>
                         </div>
                       </div>
@@ -122,15 +126,9 @@ export default function Charts({ agents, fetching }) {
                         <h3 className="text-2xl text-blue-600 font-semibold">
                           {agent.totalisting}
                         </h3>
-                        <p className="text-[11px] text-zinc-500">
+                        <p className="text-[10px] text-zinc-500 -mt-1">
                           Total Listing
                         </p>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <h3 className="text-xs font-semibold">
-                          {agent.country}
-                        </h3>
-                        <p className="text-[11px] text-zinc-500">Country</p>
                       </div>
                     </main>
                   ))}

@@ -4,6 +4,26 @@ import { useSelector } from "react-redux";
 import CircularProgress from "../components/CircularProgress";
 import GreenSpinner from "../components/GreenSpinner";
 import toast from "react-hot-toast";
+import Loader from "../../components/Loader";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import Properties from "../includes/statistics/Properties";
+import Users from "../includes/statistics/Users";
+import Agents from "../includes/statistics/Agents";
+import Reviews from "../includes/statistics/Reviews";
+import Enquiry from "../includes/statistics/Enquiries";
+import Contacts from "../includes/statistics/Contacts";
 export default function AdminStatistics() {
   const API_URL =
     window.location.hostname === "localhost"
@@ -12,7 +32,14 @@ export default function AdminStatistics() {
 
   const user = useSelector((state) => state.user);
   const [fetching, setFetching] = useState({ type: "", status: false });
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({
+    activeListings: [],
+    soldListings: [],
+    rentedListings: [],
+    users: [],
+    agents: [],
+  });
+
   const [listings, setListings] = useState([]);
   const [agents, setAgents] = useState([]);
   const [users, setUsers] = useState([]);
@@ -64,50 +91,6 @@ export default function AdminStatistics() {
         }
       } finally {
         setFetching({ type: "listing", status: false });
-      }
-    };
-    const fetchAgents = async () => {
-      setFetching({ type: "agent", status: true });
-      const cacheKey = `househunter-agent-cache-admin-dashboard-${user._id}`;
-      const cached = JSON.parse(localStorage.getItem(cacheKey));
-
-      try {
-        const {
-          data: { lastUpdated },
-        } = await axios.get(`${API_URL}/timestamp/user/updatedAt`, {
-          withCredentials: true,
-        });
-
-        if (cached && cached.lastUpdated === lastUpdated) {
-          setAgents(cached.data);
-          setFetching({ type: "agent", status: false });
-          return;
-        }
-        const { data } = await axios.get(
-          `${API_URL}/statistics/agent/fetch/admin`,
-          {
-            withCredentials: true,
-          }
-        );
-        setAgents(data);
-        localStorage.setItem(cacheKey, JSON.stringify({ data, lastUpdated }));
-      } catch (error) {
-        console.error(error);
-        if (error.response?.data) {
-          toast.error(
-            error.response.data.message ||
-              "Unable to perfom your request. Please try again.",
-            {
-              id: "123",
-            }
-          );
-        } else {
-          toast.error("Unable to perfom your request. Please try again.", {
-            id: "123",
-          });
-        }
-      } finally {
-        setFetching({ type: "agent", status: false });
       }
     };
     const fetchUsers = async () => {
@@ -332,176 +315,134 @@ export default function AdminStatistics() {
         setFetching({ type: "enquiry", status: false });
       }
     };
+    const fetchData = async () => {
+      setFetching({ type: "chart", status: true });
+      try {
+        const res = await axios.get(`${API_URL}/statistics/combined-stats`, {
+          withCredentials: true,
+        });
 
+        const listingsData = res.data.listings;
+        const usersData = res.data.usersByMonth;
+        const reviewData = res.data.reviewsByMonth;
+        const enquiryData = res.data.enquiriesByMonth;
+        const contactData = res.data.contactsByMonth;
+
+        const now = new Date();
+        const activeListings = [];
+        const soldListings = [];
+        const rentedListings = [];
+        const users = [];
+        const agents = [];
+        const reviews = [];
+        const enquiries = [];
+        const contacts = [];
+
+        // Create maps for quick data lookup
+        const listingsMap = listingsData.reduce((acc, yearData) => {
+          yearData.months.forEach((monthData) => {
+            const key = `${yearData._id}-${monthData.month}`;
+            if (!acc[key]) acc[key] = {};
+            acc[key][monthData.status] = monthData.count;
+          });
+          return acc;
+        }, {});
+
+        const usersMap = usersData.reduce((acc, yearData) => {
+          yearData.months.forEach((monthData) => {
+            const key = `${yearData._id}-${monthData.month}`;
+            if (!acc[key]) acc[key] = {};
+            acc[key][monthData.role] = monthData.count;
+          });
+          return acc;
+        }, {});
+
+        const reviewsMap = reviewData.reduce((acc, item) => {
+          const key = `${item._id.year}-${item._id.month}`;
+          acc[key] = item.count;
+          return acc;
+        }, {});
+
+        const enquiryMap = enquiryData.reduce((acc, item) => {
+          const key = `${item._id.year}-${item._id.month}`;
+          acc[key] = item.count;
+          return acc;
+        }, {});
+
+        const contactMap = contactData.reduce((acc, item) => {
+          const key = `${item._id.year}-${item._id.month}`;
+          acc[key] = item.count;
+          return acc;
+        }, {});
+
+        // Single loop to process all data types
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const year = d.getFullYear();
+          const month = d.getMonth() + 1;
+          const label = d.toLocaleDateString("en-US", { month: "short" });
+          const key = `${year}-${month}`;
+
+          const listingsCounts = listingsMap[key] || {};
+          activeListings.push({
+            date: label,
+            count: listingsCounts.active || 0,
+          });
+          soldListings.push({ date: label, count: listingsCounts.sold || 0 });
+          rentedListings.push({
+            date: label,
+            count: listingsCounts.rented || 0,
+          });
+
+          const usersCounts = usersMap[key] || {};
+          users.push({ date: label, count: usersCounts.User || 0 });
+          agents.push({ date: label, count: usersCounts.Agent || 0 });
+
+          reviews.push({ date: label, count: reviewsMap[key] || 0 });
+          enquiries.push({ date: label, count: enquiryMap[key] || 0 });
+          contacts.push({ date: label, count: contactMap[key] || 0 });
+        }
+
+        setData({
+          activeListings,
+          soldListings,
+          rentedListings,
+          users,
+          agents,
+          reviews,
+          enquiries,
+          contacts,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setFetching({ type: "chart", status: false });
+      }
+    };
+
+    fetchData();
     fetchListings();
-    // fetchAgents();
     fetchUsers();
-    // fetchReviews();
-    // fetchContacts();
+    fetchReviews();
+    fetchContacts();
     // fetchBlogs();
-    // fetchEnquiries();
+    fetchEnquiries();
   }, []);
-  const activeListings =
-    listings?.filter((prop) => prop.status == "active").length || 0;
-  const pendingListing =
-    listings?.filter((prop) => prop.status == "pending").length || 0;
-  const archivedListing =
-    listings?.filter((prop) => prop.status == "archived").length || 0;
-  const soldListing =
-    listings?.filter((prop) => prop.status == "sold").length || 0;
-  const rentedListing =
-    listings?.filter((prop) => prop.status == "rented").length || 0;
+
   return (
     <article className="flex flex-col gap-4">
-      <section className="w-full flex items-center gap-2">
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-zinc-600 leading-tight">
-              Total Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{listings && listings.length}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              (
-                (Number(listings.length) / Number(listings?.length)) *
-                100
-              ).toFixed(1) || 0
-            }
-            color={"#155dfc"}
-          />
-        </article>
+      <Properties fetching={fetching} listings={listings} data={data} />
+      <Users fetching={fetching} users={users} data={data} />
 
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-zinc-600 leading-tight">
-              Published Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{activeListings}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              (
-                (Number(activeListings) / Number(listings?.length)) *
-                100
-              ).toFixed(1) || 0
-            }
-            color={"#007a55"}
-          />
-        </article>
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
-              Pending Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{pendingListing}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              (
-                (Number(pendingListing) / Number(listings?.length)) *
-                100
-              ).toFixed(1) || 0
-            }
-            color={"#ff6900 "}
-          />
-        </article>
+      <Agents fetching={fetching} agents={agents} data={data} />
+      <Reviews fetching={fetching} reviews={reviews} data={data} />
+      <Enquiry fetching={fetching} enquiries={enquiries} data={data} />
+      <Contacts fetching={fetching} contacts={contacts} data={data} />
 
+      {/* <section className="w-full flex items-center gap-4">
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
-              Rented Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{rentedListing}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              (
-                (Number(rentedListing) / Number(listings?.length)) *
-                100
-              ).toFixed(1) || 0
-            }
-            color={"#721378"}
-          />
-        </article>
-
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
-              Sold Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{soldListing}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              ((Number(soldListing) / Number(listings?.length)) * 100).toFixed(
-                1
-              ) || 0
-            }
-            color={"oklch(72.3% 0.219 149.579)"}
-          />
-        </article>
-
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
-              Archived Properties
-            </p>
-            <h3 className="font-bold text-2xl font-primary">
-              {fetching.type === "listing" && fetching.status ? (
-                <GreenSpinner />
-              ) : (
-                <>{archivedListing}</>
-              )}
-            </h3>
-          </main>
-          <CircularProgress
-            percentage={
-              (
-                (Number(archivedListing) / Number(listings?.length)) *
-                100
-              ).toFixed(1) || 0
-            }
-            color={"#09090b "}
-          />
-        </article>
-      </section>
-      {agents.length}
-
-      <section className="w-full flex items-center gap-2">
-        <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
-          <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-zinc-600 leading-tight">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600">
               Total Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -523,7 +464,7 @@ export default function AdminStatistics() {
         </article>
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-zinc-600 leading-tight">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600">
               Active Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -544,14 +485,14 @@ export default function AdminStatistics() {
                 ) /
                   Number(users?.length)) *
                 100
-              ).toFixed(1) || 0
+              ) || 0
             }
             color={"oklch(62.7% 0.194 149.214)"}
           />
         </article>
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600 ">
               Suspended Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -574,14 +515,14 @@ export default function AdminStatistics() {
                 ) /
                   Number(users?.length)) *
                 100
-              ).toFixed(1) || 0
+              ) || 0
             }
             color={"#ff6900 "}
           />
         </article>
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600 ">
               Banned Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -602,14 +543,14 @@ export default function AdminStatistics() {
                 ) /
                   Number(users?.length)) *
                 100
-              ).toFixed(1) || 0
+              ) || 0
             }
             color={"#fe0000"}
           />
         </article>
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600 ">
               Verified Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -632,14 +573,14 @@ export default function AdminStatistics() {
                 ) /
                   Number(users?.length)) *
                 100
-              ).toFixed(1) || 0
+              ) || 0
             }
             color={"oklch(72.3% 0.219 149.579)"}
           />
         </article>
         <article className="bg-white rounded-xl p-3 w-full flex items-center justify-between">
           <main className="flex flex-col gap-1">
-            <p className="text-xs font-medium leading-tight text-zinc-600 ">
+            <p className="text-[13px] font-semibold leading-tight text-zinc-600 ">
               Unverified Users
             </p>
             <h3 className="font-bold text-2xl font-primary">
@@ -662,12 +603,12 @@ export default function AdminStatistics() {
                 ) /
                   Number(users?.length)) *
                 100
-              ).toFixed(1) || 0
+              ) || 0
             }
             color={"#09090b "}
           />
         </article>
-      </section>
+      </section> */}
     </article>
   );
 }

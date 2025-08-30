@@ -14,7 +14,7 @@ import Loader from "../../components/Loader";
 
 export default function Listings() {
   const user = useSelector((state) => state.user);
-  const cacheKey = `RentaHome-listing-cache`;
+  const cacheKey = `househunter-listing-cache`;
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(6);
   const itemsPerPage = 6;

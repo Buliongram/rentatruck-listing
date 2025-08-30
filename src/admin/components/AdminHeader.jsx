@@ -1,9 +1,10 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
   BiChevronDown,
   BiMessageSquareDetail,
+  BiPhoneCall,
   BiSupport,
   BiUser,
 } from "react-icons/bi";
@@ -14,12 +15,13 @@ import {
   FaMagento,
   FaRegChartBar,
   FaRegHeart,
+  FaRegNewspaper,
   FaUsers,
 } from "react-icons/fa6";
 import { GoShield } from "react-icons/go";
 import { IoExitOutline, IoGridOutline } from "react-icons/io5";
 import { LuHouse, LuMapPinHouse } from "react-icons/lu";
-import { MdMessage, MdOutlineReviews } from "react-icons/md";
+import { MdMessage, MdOutlineReviews, MdReviews } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { updateUser } from "../../assets/store/userSlice";
@@ -33,75 +35,10 @@ export default function AdminHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [listingCount, setListingCount] = useState(0);
   const [disableBtn, setDisableBtn] = useState(false);
-  const navLinks = [
-    {
-      id: "01",
-      name: "Overview",
-      path: "/admin",
-      icon: <IoGridOutline />,
-      user: false,
-    },
-    {
-      id: "1",
-      name: "Listings",
-      path: "/admin/listings",
-      icon: <LuHouse />,
-      user: false,
-    },
-    {
-      id: "2",
-      name: "Post Property",
-      path: "/admin/create/listing",
-      icon: <BsHouseAdd />,
-      user: false,
-    },
-    {
-      id: "3",
-      name: "Enquiries",
-      path: "/admin/enquiries",
-      icon: <MdMessage />,
-      user: false,
-    },
-    {
-      id: "4",
-      name: "Statistics",
-      path: "/admin/statistics",
-      icon: <FaRegChartBar />,
-      user: false,
-    },
-    {
-      id: "5",
-      name: "Users",
-      path: "/admin/users",
-      icon: <FaUsers />,
-      user: false,
-    },
-    {
-      id: "6",
-      name: "Agents",
-      path: "/admin/agents",
-      icon: <LuMapPinHouse />,
-      user: false,
-    },
-  ];
+
   const [dropdown, Setdropdown] = useState(false);
-  const renderLinks = () => {
-    return navLinks.map(({ name, path, id, icon }) => (
-      <Link
-        key={id}
-        to={path}
-        className={`flex items-center gap-0.5 text-xs px-3 py-1.5 rounded-xl font-semibold ${
-          location.pathname === path
-            ? "bg-blue-600 text-white "
-            : "bg-zinc-100/60 hover:bg-blue-600 text-zinc-600 hover:text-white"
-        } `}
-      >
-        {icon}
-        {name}
-      </Link>
-    ));
-  };
 
   const handleLogout = async () => {
     toast.loading("Logging you out", { id: "123" });
@@ -210,26 +147,143 @@ export default function AdminHeader() {
       </Link>
     ));
   };
+  useEffect(() => {
+    const fetchListingCount = async () => {
+      const url =
+        window.location.hostname === "localhost"
+          ? `http://localhost:5000/api`
+          : `https://rentahome-server.onrender.com/api`;
+      const cacheKey = `househunter-listing-cache-count-${userState._id}`;
+      const cached = JSON.parse(localStorage.getItem(cacheKey));
+      try {
+        const {
+          data: { lastUpdated },
+        } = await axios.get(`${url}/timestamp/listing/updatedAt`, {
+          withCredentials: true,
+        });
+        if (cached && cached.lastUpdated === lastUpdated) {
+          const cacheCount =
+            cached.count?.filter((data) => data.status === "pending").length ||
+            0;
+          setListingCount(cacheCount);
+          return;
+        }
+        const { data } = await axios.get(`${url}/listing/fetch/dashboard`, {
+          withCredentials: true,
+        });
+        const count = data.filter((data) => data.status === "pending");
+        setListingCount(count.length);
+        localStorage.setItem(cacheKey, JSON.stringify({ count, lastUpdated }));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchListingCount();
+  }, []);
+  const navLinks = [
+    // {
+    //   id: "01",
+    //   name: "Overview",
+    //   path: "/admin",
+    //   icon: <IoGridOutline />,
+    //   user: false,
+    //   count: "",
+    // },
 
+    {
+      id: "1",
+      name: "Post Property",
+      path: "/admin/create/listing",
+      icon: <BsHouseAdd />,
+      user: false,
+      count: "",
+    },
+    {
+      id: "2",
+      name: "Listings",
+      path: "/admin/listings",
+      icon: <LuHouse />,
+      user: false,
+
+      count: listingCount,
+    },
+    {
+      id: "4",
+      name: "Statistics",
+      path: "/admin/statistics",
+      icon: <FaRegChartBar />,
+      user: false,
+      count: "",
+    },
+    {
+      id: "5",
+      name: "Users",
+      path: "/admin/users",
+      icon: <FaUsers />,
+      user: false,
+      count: "",
+    },
+    {
+      id: "6",
+      name: "Agents",
+      path: "/admin/agents",
+      icon: <LuMapPinHouse />,
+      user: false,
+      count: "",
+    },
+    {
+      id: "7",
+      name: "Enquiries",
+      path: "/admin/enquiries",
+      icon: <MdMessage />,
+      user: false,
+      count: "",
+    },
+    {
+      id: "8",
+      name: "Reviews",
+      path: "/admin/reviews",
+      icon: <MdReviews />,
+      user: false,
+      count: "",
+    },
+  ];
+  const renderLinks = () => {
+    return navLinks.map(({ name, path, id, icon, count }) => (
+      <Link
+        key={id}
+        to={path}
+        className={`flex items-center gap-0.5 text-xs px-3 py-1.5 rounded-xl font-semibold relative ${
+          location.pathname === path
+            ? "bg-blue-600 text-white "
+            : "bg-zinc-100/60 hover:bg-blue-600 text-zinc-600 hover:text-white"
+        } `}
+      >
+        {count !== "" && count > 0 ? (
+          <span className="h-5 min-w-5 rounded-full bg-[#f30000] absolute text-white -right-2 text-xs font-bold -top-2 flex items-center justify-center">
+            {count}
+          </span>
+        ) : (
+          ""
+        )}
+        {icon}
+        {name}
+      </Link>
+    ));
+  };
   return (
     <header className="flex items-center justify-between bg-white p-3 rounded-2xl relative">
-      <Link to={"/"} className="flex items-center gap-1">
+      {/* <Link to={"/"} className="flex items-center gap-1">
         <span className="h-8 w-8 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center">
           <FaMagento />
         </span>
         <div className="text-lg font-semibold text-blue-600 font-primary mt-1">
           HouseHunter
         </div>
-      </Link>
+      </Link> */}
       <section className="flex items-center gap-2">{renderLinks()}</section>
 
       <section className="flex items-center gap-1">
-        <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-blue-600">
-          <CiSettings />
-        </span>
-        <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-blue-600">
-          <CiBellOn />
-        </span>
         <main
           onClick={() => Setdropdown(!dropdown)}
           className="flex items-center gap-1 cursor-pointer"
@@ -243,7 +297,7 @@ export default function AdminHeader() {
           </span>
           <div className="flex flex-col">
             <span className="text-xs font-semibold">
-              {`${userState.firstname} ${userState.lastname}`}
+              {`${userState.firstname}`}
             </span>
             <p className="text-[10px] text-zinc-500">{userState.role}</p>
           </div>
@@ -254,7 +308,7 @@ export default function AdminHeader() {
       <section
         className={`absolute ${
           dropdown ? "maxheightfull" : "maxheight0"
-        } bg-white transition-all backdrop-blur-md w-[200px] top-full rounded-b-2xl overflow-hidden right-0 z-[11] `}
+        } bg-white transition-all backdrop-blur-md w-[200px] top-full rounded-b-2xl overflow-hidden lg:hidden right-0 z-[11] `}
       >
         <main className="flex flex-col w-full p-4 gap-1">
           {renderDropdownLinks()}

@@ -50,7 +50,7 @@ export default function Reviews() {
           : `https://rentahome-server.onrender.com/api`;
 
       setLoading(true);
-      const cacheKey = `RentaHome-reviews-cache-${user._id}`;
+      const cacheKey = `househunter-reviews-cache-${user._id}`;
       const cached = JSON.parse(localStorage.getItem(cacheKey));
 
       try {

@@ -5,6 +5,7 @@ import {
 } from "../../data/createListingData";
 import {
   FaCamera,
+  FaCircleExclamation,
   FaEye,
   FaLocationDot,
   FaTrash,
@@ -33,8 +34,13 @@ export default function AdminListings() {
   const [loading, setLoading] = useState(false);
   const [spinning, setSpinning] = useState({ type: "", status: false });
   const [toggleDelete, setToggleDelete] = useState(false);
+  const [toggleUpdate, setToggleUpdate] = useState(false);
   const [listingToDelete, setListingToDelete] = useState(null);
-  const [selectedListing, setSelectedListing] = useState(null);
+  const [listingToEdit, setListingToEdit] = useState(null);
+  const [selectedListing, setSelectedListing] = useState({
+    id: null,
+    status: "",
+  });
   const [allListings, setAllListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [listingType, setListingType] = useState("all");
@@ -57,7 +63,7 @@ export default function AdminListings() {
           : `https://rentahome-server.onrender.com/api`;
 
       setLoading(true);
-      const cacheKey = `househunter-listing-cache-dadmin-dashboard-${user._id}`;
+      const cacheKey = `househunter-listing-cache-admin-dashboard-${user._id}`;
 
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
@@ -152,6 +158,12 @@ export default function AdminListings() {
     setFilters({ ...filters, [name]: value });
   };
 
+  const confirmStatus = (listingId, status) => {
+    setSelectedListing({ id: listingId, status: status });
+    setToggleUpdate(true);
+    setShowActions(false);
+  };
+
   const handleStatusChange = async (listingId, newStatus) => {
     const url =
       window.location.hostname === "localhost"
@@ -185,8 +197,8 @@ export default function AdminListings() {
               : listing
           )
         );
-
         setShowActions(false);
+        setToggleUpdate(false);
       }
     } catch (error) {
       if (error.response?.data) {
@@ -269,10 +281,13 @@ export default function AdminListings() {
     }
   };
 
-  const handleEditListing = (listingId) => {
-    console.log(`Navigating to edit page for listing ID: ${listingId}`);
-    // Use React Router to navigate: `Maps(`/admin/edit/${listingId}`);`
-    setShowActions(null); // Close actions menu
+  const handleEditListing = () => {
+    toast.loading("Redirecting to edit page....", { id: "123" });
+    setShowActions(false);
+    setTimeout(() => {
+      toast.success("Edit page redirect successful.", { id: "123" });
+      navigate(`/admin/listing/edit/${selectedListing.id}`);
+    }, 1500);
   };
 
   const handlePriceChange = (e) => {
@@ -440,7 +455,10 @@ export default function AdminListings() {
                   <span
                     onClick={() => {
                       setShowActions(true);
-                      setSelectedListing(house._id);
+                      setSelectedListing({
+                        id: house._id,
+                        status: house.status,
+                      });
                     }}
                     className="p-2 bg-white rounded-lg cursor-pointer absolute top-4 right-4"
                   >
@@ -556,7 +574,7 @@ export default function AdminListings() {
                         <CiTrash /> Delete Listing
                       </span>
                       <button
-                        onClick={() => confirmDelete(selectedListing)}
+                        onClick={() => confirmDelete(selectedListing.id)}
                         className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-[#f30000] hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
                       >
                         Proceed to delete
@@ -567,62 +585,167 @@ export default function AdminListings() {
                       <span className="text-xs font-semibold flex items-center gap-0.5">
                         <CiEdit /> Edit Listing
                       </span>
-                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
+                      <button
+                        onClick={handleEditListing}
+                        className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-fuchsia-950 hover:bg-fuchsia-500 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                      >
                         Proceed to edit
                       </button>
                     </main>
 
-                    <main className="flex items-center justify-between w-full py-1">
-                      <span className="text-xs font-semibold flex items-center gap-0.5">
-                        <FaRegFileArchive /> Archive Listing
-                      </span>
-                      <button
-                        onClick={() =>
-                          handleStatusChange(selectedListing, "archived")
-                        }
-                        className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
-                      >
-                        {spinning.type === "archived" && spinning.status ? (
-                          <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
-                        ) : (
-                          "Proceed to archive"
-                        )}
-                      </button>
-                    </main>
+                    {selectedListing.status === "active" ? (
+                      <>
+                        <main className="flex items-center justify-between w-full py-1">
+                          <span className="text-xs font-semibold flex items-center gap-0.5">
+                            <LuBadgeCheck />
+                            Mark as pending
+                          </span>
+                          <button
+                            onClick={() =>
+                              confirmStatus(selectedListing.id, "pending")
+                            }
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-orange-600 hover:bg-orange-700 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                          >
+                            {spinning.type === "pending" && spinning.status ? (
+                              <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                            ) : (
+                              "Proceed"
+                            )}
+                          </button>
+                        </main>
+                        <main className="flex items-center justify-between w-full py-1">
+                          <span className="text-xs font-semibold flex items-center gap-0.5">
+                            <FaRegFileArchive /> Archive Listing
+                          </span>
+                          <button
+                            onClick={() =>
+                              confirmStatus(selectedListing.id, "archived")
+                            }
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-zinc-950 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                          >
+                            {spinning.type === "archived" && spinning.status ? (
+                              <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                            ) : (
+                              "Proceed to archive"
+                            )}
+                          </button>
+                        </main>
+                      </>
+                    ) : (
+                      <>
+                        <main className="flex items-center justify-between w-full py-1">
+                          <span className="text-xs font-semibold flex items-center gap-0.5">
+                            <LuBadgeCheck />
+                            Publish Listing
+                          </span>
+                          <button
+                            onClick={() =>
+                              confirmStatus(selectedListing.id, "active")
+                            }
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-green-600 hover:bg-green-700 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                          >
+                            {spinning.type === "active" && spinning.status ? (
+                              <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                            ) : (
+                              "Proceed to publish"
+                            )}
+                          </button>
+                        </main>
+                      </>
+                    )}
 
-                    <main className="flex items-center justify-between w-full py-1">
-                      <span className="text-xs font-semibold flex items-center gap-0.5">
-                        <LuBadgeCheck />
-                        Publish Listing
-                      </span>
-                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
-                        Proceed to publish
-                      </button>
-                    </main>
-
-                    <main className="flex items-center justify-between w-full py-1">
-                      <span className="text-xs font-semibold flex items-center gap-0.5">
-                        <LuBadgeCheck />
-                        Mark as sold
-                      </span>
-                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
-                        Proceed
-                      </button>
-                    </main>
-
-                    <main className="flex items-center justify-between w-full py-1">
-                      <span className="text-xs font-semibold flex items-center gap-0.5">
-                        <LuBadgeCheck />
-                        Mark as rented
-                      </span>
-                      <button className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer">
-                        Proceed
-                      </button>
-                    </main>
+                    {selectedListing.status == "sold" ||
+                    selectedListing.status == "rented" ||
+                    selectedListing.status !== "rented" ? (
+                      ""
+                    ) : (
+                      <>
+                        <main className="flex items-center justify-between w-full py-1">
+                          <span className="text-xs font-semibold flex items-center gap-0.5">
+                            <LuBadgeCheck />
+                            Mark as sold
+                          </span>
+                          <button
+                            onClick={() =>
+                              confirmStatus(selectedListing.id, "sold")
+                            }
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                          >
+                            {spinning.type === "sold" && spinning.status ? (
+                              <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                            ) : (
+                              "Proceed"
+                            )}
+                          </button>
+                        </main>
+                        <main className="flex items-center justify-between w-full py-1">
+                          <span className="text-xs font-semibold flex items-center gap-0.5">
+                            <LuBadgeCheck />
+                            Mark as rented
+                          </span>
+                          <button
+                            onClick={() =>
+                              confirmStatus(selectedListing.id, "rented")
+                            }
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                          >
+                            {spinning.type === "rented" && spinning.status ? (
+                              <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                            ) : (
+                              "Proceed"
+                            )}
+                          </button>
+                        </main>
+                      </>
+                    )}
                   </section>
                 </section>
               </section>
             </>
+          )}
+
+          {toggleUpdate && (
+            <section className="fixed h-full w-full top-0 left-0 bg-black/60 flex items-center justify-center z-50">
+              <section
+                className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[450px] w-full fixed md:relative bottom-0 `}
+              >
+                <FaCircleExclamation className="text-[#fe0000] text-7xl" />
+
+                <div className="flex flex-col gap-1 items-center">
+                  <h2 className="font-semibold text-xl">Are you sure?</h2>
+
+                  <p className="text-sm font-medium text-center">
+                    Changing this listing’s status will affect how it is
+                    displayed. Do you want to continue?
+                  </p>
+                </div>
+
+                <div className="flex items-center w-full gap-4">
+                  <span
+                    onClick={() => setToggleUpdate(false)}
+                    className="flex text-xs items-center justify-center gap-2 border border-zinc-300 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                  >
+                    Cancel
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleStatusChange(
+                        selectedListing.id,
+                        selectedListing.status
+                      )
+                    }
+                    className="flex text-xs items-center justify-center shrink gap-2 text-white bg-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                  >
+                    {spinning.type === selectedListing.status &&
+                    spinning.status ? (
+                      <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
+                    ) : (
+                      "Yes, I understand"
+                    )}
+                  </button>
+                </div>
+              </section>
+            </section>
           )}
         </>
       </section>

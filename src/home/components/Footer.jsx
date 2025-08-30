@@ -22,7 +22,7 @@ export default function Footer() {
                 <span className="h-8 w-8 rounded-lg bg-black text-white flex items-center justify-center">
                   <HiOutlineHomeModern />
                 </span>
-                <span className="text-xl font-semibold">RentaHome</span>
+                <span className="text-xl font-semibold">HouseHunter</span>
               </div>
               <p className="text-xs text-zinc-500 font-normal max-w-[400px]">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
@@ -71,7 +71,7 @@ export default function Footer() {
           </article>
           <section className="pt-6 flex items-center justify-between text-xs text-zinc-500 flex-col lg:flex-row gap-3">
             <span className="flex items-center gap-0.5">
-              <BiCopyright /> {new Date().getFullYear()} RentaHome. All rights
+              <BiCopyright /> {new Date().getFullYear()} HouseHunter. All rights
               revserved
             </span>
             <div className="flex items-center gap-2 lg:gap-4">

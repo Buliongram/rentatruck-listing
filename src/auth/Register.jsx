@@ -177,7 +177,7 @@ export default function Register() {
             <span className="h-8 w-8 rounded-lg text-lg bg-primary text-white flex items-center justify-center">
               <FaMagento />
             </span>
-            <div className="text-xl font-medium text-primary">RentaHome</div>
+            <div className="text-xl font-medium text-primary">HouseHunter</div>
           </Link>
           {!toggleSignupCont ? (
             <>
@@ -221,7 +221,7 @@ export default function Register() {
             <section className="w-full">
               <div className="flex flex-col gap-1 items-center w-full">
                 <h1 className="font-semibold text-2xl tracking-tight">
-                  Sign up on RentaHome!
+                  Sign up on HouseHunter!
                 </h1>
                 <p
                   onClick={() => {

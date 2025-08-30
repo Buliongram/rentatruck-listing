@@ -237,7 +237,7 @@ export default function AgentHeader() {
           </span>
           <div className="flex flex-col">
             <span className="text-xs font-semibold">
-              {`${userState.firstname} ${userState.lastname}`}
+              {`${userState.firstname} ${userState.lastname||''}`}
             </span>
             <p className="text-[10px] text-zinc-500">{userState.role}</p>
           </div>
