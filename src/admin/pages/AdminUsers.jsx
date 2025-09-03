@@ -228,7 +228,7 @@ export default function AdminUsers() {
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
           <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
             Users{" "}
-            <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+            <span className="text-white bg-zinc-950 p-1 px-2 rounded-lg text-xs">
               {users.length}
             </span>
           </span>
@@ -243,14 +243,14 @@ export default function AdminUsers() {
                 className="placeholder:text-xs outline-none bg-transparent text-sm text-zinc-500 pr-6"
               />
             </main>
-            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-blue-600">
+            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-zinc-950">
               {categories.map((filter) => (
                 <span
                   key={filter.name}
                   onClick={() => setStatusFilter(filter.name)}
                   className={`rounded-xl px-6 py-1.5 cursor-pointer transition duration-200 capitalize ${
                     statusFilter === filter.name
-                      ? "bg-blue-600 text-white"
+                      ? "bg-zinc-950 text-white"
                       : "hover:bg-white"
                   }`}
                 >
@@ -281,7 +281,7 @@ export default function AdminUsers() {
                     {user.firstname} {user.middlename || ""}{" "}
                     {user.lastname || ""}
                   </td>
-                  <td className="text-blue-600">
+                  <td className="text-zinc-950">
                     <a href={`tel:${user.number}`}>
                       {user.number || "Not added yet"}
                     </a>
@@ -345,7 +345,7 @@ export default function AdminUsers() {
                             status: user.status,
                           });
                         }}
-                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-blue-600 text-white border-zinc-200 cursor-pointer"
+                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-zinc-950 text-white border-zinc-200 cursor-pointer"
                       >
                         <BiPencil />
                       </span>
@@ -506,13 +506,13 @@ export default function AdminUsers() {
             <div className="flex items-center w-full gap-4">
               <span
                 onClick={clearToggleEdit}
-                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Cancel
               </span>
               <button
                 type="submit"
-                className="flex text-xs items-center justify-center shrink gap-2 text-white bg-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center shrink gap-2 text-white bg-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 <BiEdit /> Edit user details
               </button>
@@ -535,7 +535,7 @@ export default function AdminUsers() {
             <div className="flex items-center w-full gap-4">
               <span
                 onClick={() => setToggleDelete(false)}
-                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Cancel
               </span>

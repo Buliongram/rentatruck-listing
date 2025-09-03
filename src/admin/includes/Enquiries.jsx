@@ -240,7 +240,7 @@ export default function Enquiries({ listings, agents, fetching }) {
           <span className="text-[16px] font-semibold">Latest Enquiries</span>
           <Link
             to={"/admin/enquiries"}
-            className="text-xs bg-blue-600 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
+            className="text-xs bg-zinc-950 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
           >
             <IoEyeOutline /> View all
           </Link>
@@ -324,7 +324,7 @@ export default function Enquiries({ listings, agents, fetching }) {
                   (Number(blogs.length) / Number(blogs?.length)) * 100 || 0
                 }
                 color={"#155dfc"}
-                icon={<FaRegNewspaper className="text-2xl text-blue-600" />}
+                icon={<FaRegNewspaper className="text-2xl text-zinc-950" />}
               />
             </article>
             <article className="bg-white rounded-2xl p-4 w-full h-full flex items-center justify-between">

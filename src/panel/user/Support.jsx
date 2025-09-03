@@ -18,7 +18,7 @@ export default function Support() {
     <>
       <section className="flex flex-col items-center gap-8 lg:p-14 p-4">
         <article className="flex flex-col items-center gap-2">
-          <h2 className="text-xl lg:text-3xl font-semibold text-blue-600">
+          <h2 className="text-xl lg:text-3xl font-semibold text-zinc-950">
             Need Assistance?
           </h2>
           <p className="text-zinc-500 text-sm text-center">
@@ -35,7 +35,7 @@ export default function Support() {
             />
             <button
               type="submit"
-              className="flex text-xs font-medium items-center justify-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl outline-none cursor-pointer w-max"
+              className="flex text-xs font-medium items-center justify-center gap-2 bg-zinc-950 text-white px-8 py-3 rounded-xl outline-none cursor-pointer w-max"
             >
               <FaSearch /> Search
               {/* {!false ? (
@@ -48,7 +48,7 @@ export default function Support() {
         </article>
         <article className="flex w-full gap-4">
           <section className="flex flex-col gap-1 border border-zinc-300 bg-white  rounded-3xl p-6 w-full">
-            <span className="h-10 w-10 rounded-lg bg-blue-600/5 border border-zinc-300 flex items-center justify-center text-blue-600 text-lg">
+            <span className="h-10 w-10 rounded-lg bg-zinc-950/5 border border-zinc-300 flex items-center justify-center text-zinc-950 text-lg">
               <BsRocket className="rotate-45" />
             </span>
             <h3 className="text-sm font-semibold">Getting Started</h3>
@@ -62,7 +62,7 @@ export default function Support() {
           </section>
 
           <section className="flex flex-col gap-1 border border-zinc-300 bg-white  rounded-3xl p-6 w-full">
-            <span className="h-10 w-10 rounded-lg bg-blue-600/5 border border-zinc-300 flex items-center justify-center text-blue-600 text-lg">
+            <span className="h-10 w-10 rounded-lg bg-zinc-950/5 border border-zinc-300 flex items-center justify-center text-zinc-950 text-lg">
               <BsRocket className="rotate-45" />
             </span>
             <h3 className="text-sm font-semibold">Getting Started</h3>
@@ -76,7 +76,7 @@ export default function Support() {
           </section>
 
           <section className="flex flex-col gap-1 border border-zinc-300 bg-white  rounded-3xl p-6 w-full">
-            <span className="h-10 w-10 rounded-lg bg-blue-600/5 border border-zinc-300 flex items-center justify-center text-blue-600 text-lg">
+            <span className="h-10 w-10 rounded-lg bg-zinc-950/5 border border-zinc-300 flex items-center justify-center text-zinc-950 text-lg">
               <BsRocket className="rotate-45" />
             </span>
             <h3 className="text-sm font-semibold">Getting Started</h3>
@@ -100,7 +100,7 @@ export default function Support() {
               Reach us at{" "}
               <a
                 href="mailto:info@househunter.com"
-                className="font-semibold underline text-blue-600"
+                className="font-semibold underline text-zinc-950"
               >
                 info@househunter.com
               </a>
@@ -115,7 +115,7 @@ export default function Support() {
                 >
                   <span>{faq.question}</span>
                   <span
-                    className={`transition-transform duration-300 text-blue-600`}
+                    className={`transition-transform duration-300 text-zinc-950`}
                   />
                   {openIndex === index ? <BiMinusCircle /> : <BiPlusCircle />}
                 </div>

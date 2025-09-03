@@ -23,19 +23,19 @@ export default function UserHeader() {
     <>
       <header className="flex items-center justify-between bg-white p-3 rounded-2xl">
         <Link to={"/"} className="flex items-center gap-1">
-          <span className="h-8 w-8 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center">
+          <span className="h-8 w-8 rounded-xl text-[16px] bg-zinc-950 text-white flex items-center justify-center">
             👋
           </span>
-          <div className="text-lg font-semibold text-blue-600 font-primary mt-1 capitalize">
+          <div className="text-lg font-semibold text-zinc-950 font-primary mt-1 capitalize">
             {`${greeting}, ${user.firstname}!`}
           </div>
         </Link>
 
         <section className="flex items-center gap-1">
-          <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-blue-600">
+          <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-zinc-950">
             <CiSettings />
           </span>
-          <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-blue-600">
+          <span className="h-9 w-9 rounded-full bg-zinc-100/60 flex items-center justify-center text-zinc-950">
             <CiBellOn />
           </span>
           <main className="flex items-center gap-1 cursor-pointer">

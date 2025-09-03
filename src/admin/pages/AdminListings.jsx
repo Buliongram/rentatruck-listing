@@ -314,14 +314,14 @@ export default function AdminListings() {
             ""
           ) : (
             <section className="flex items-center justify-between">
-              <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-blue-600">
+              <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-zinc-950">
                 {categories.map((item) => (
                   <span
                     key={item.name}
                     onClick={() => setListingType(item.name.toLowerCase())}
                     className={`rounded-xl px-6 py-1.5 cursor-pointer transition duration-200 ${
                       listingType === item.name.toLowerCase()
-                        ? "bg-blue-600 text-white"
+                        ? "bg-zinc-950 text-white"
                         : "hover:bg-white"
                     }`}
                   >
@@ -329,7 +329,7 @@ export default function AdminListings() {
                   </span>
                 ))}
               </main>
-              <span className="bg-blue-600 text-white px-7 text-xs font-medium py-2 rounded-xl">
+              <span className="bg-zinc-950 text-white px-7 text-xs font-medium py-2 rounded-xl">
                 {loading ? (
                   <GreenSpinner />
                 ) : (
@@ -473,13 +473,13 @@ export default function AdminListings() {
                         {house?.title}
                       </h3>
                       <ShareButton
-                        color={"blue-600"}
+                        color={"zinc-950"}
                         listingTitle={house?.title}
                         listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
                       />
                     </section>
                     <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                      <FaLocationDot className="text-blue-600" />
+                      <FaLocationDot className="text-zinc-950" />
                       {house?.location.area + ", " + house?.location.state}
                     </p>
                   </article>
@@ -533,7 +533,7 @@ export default function AdminListings() {
                 <div className="flex items-center w-full gap-4">
                   <span
                     onClick={() => setToggleDelete(false)}
-                    className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                    className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
                   >
                     Cancel
                   </span>
@@ -669,7 +669,7 @@ export default function AdminListings() {
                             onClick={() =>
                               confirmStatus(selectedListing.id, "sold")
                             }
-                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-zinc-950 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
                           >
                             {spinning.type === "sold" && spinning.status ? (
                               <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>
@@ -687,7 +687,7 @@ export default function AdminListings() {
                             onClick={() =>
                               confirmStatus(selectedListing.id, "rented")
                             }
-                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-blue-600 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
+                            className="flex text-[11px] items-center justify-center min-w-[150px] shrink gap-2 text-white bg-zinc-950 hover:bg-zinc-950 font-semibold w-max p-2 px-3 rounded-xl outline-none cursor-pointer"
                           >
                             {spinning.type === "rented" && spinning.status ? (
                               <span className="spinner h-[15px] w-[15px] border-2 border-white border-b-transparent rounded-full inline-block"></span>

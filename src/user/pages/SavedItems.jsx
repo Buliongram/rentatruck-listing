@@ -177,7 +177,7 @@ export default function SavedItems() {
                       id: house._id,
                     });
                   }}
-                  className="p-2 text-white bg-blue-600 rounded-lg cursor-pointer absolute top-4 right-4"
+                  className="p-2 text-white bg-zinc-950 rounded-lg cursor-pointer absolute top-4 right-4"
                 >
                   <BiTrash className="text-xs" />
                 </span>
@@ -189,13 +189,13 @@ export default function SavedItems() {
                         {house?.title}
                       </h3>
                       <ShareButton
-                        color={"blue-600"}
+                        color={"zinc-950"}
                         listingTitle={house?.title}
                         listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
                       />
                     </section>
                     <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                      <FaLocationDot className="text-blue-600" />
+                      <FaLocationDot className="text-zinc-950" />
                       {house?.location.area + ", " + house?.location.state}
                     </p>
                   </article>

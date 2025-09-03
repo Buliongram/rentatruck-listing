@@ -29,6 +29,8 @@ import {
   FaRegStar,
   FaStar,
   FaWhatsapp,
+  FaImage,
+  FaVideo,
 } from "react-icons/fa";
 import { FaArrowLeftLong, FaLinkedinIn } from "react-icons/fa6";
 import { TbMeterSquare } from "react-icons/tb";
@@ -52,7 +54,9 @@ export default function SingleListing() {
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [isFavouriting, setIsFavouriting] = useState(false);
   const [isEnquiring, setIsEnquiring] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // State to control the view: true for images, false for video
+
+  const [showImages, setShowImages] = useState(false);
 
   const [enquiryInput, setEnquiryInput] = useState({
     name: "",
@@ -134,6 +138,10 @@ export default function SingleListing() {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === listing.images.length - 1 ? 0 : prevIndex + 1
     );
+  }; // Function to toggle between images and video
+
+  const toggleMediaView = () => {
+    setShowImages((prev) => !prev);
   };
 
   const handleAddToFavourite = async (e) => {
@@ -271,6 +279,39 @@ export default function SingleListing() {
     return <NoRecord />;
   }
 
+  function YouTubeEmbed({ url }) {
+    let videoId = "";
+
+    if (url.includes("youtu.be")) {
+      // Handle short links
+      videoId = url.split("youtu.be/")[1].split("?")[0];
+    } else if (url.includes("watch?v=")) {
+      // Handle normal links
+      videoId = url.split("v=")[1].split("&")[0];
+    }
+
+    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+
+    return (
+      <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+        <iframe
+          src={embedUrl}
+          title="YouTube video player"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "80%",
+          }}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
   const mapPosition = [6.5244, 3.3792];
 
   return (
@@ -279,37 +320,67 @@ export default function SingleListing() {
         <main className="flex items-center gap-1 text-xs text-zinc-500 font-normal">
           <FaArrowLeftLong /> Back to property list
         </main>
-        <h3 className="text-2xl font-semibold">Property Details</h3>
+        <h3 className="text-2xl font-semibold">Property Details</h3>{" "}
       </section>
       <section className="flex gap-4">
         <article className="w-full flex flex-col rounded-2xl overflow-hidden border border-zinc-200">
           <section className="h-[380px] rounded-t-2xl relative w-full">
-            <div className="absolute top-3 left-3 bg-orange-600 text-white rounded-lg text-[10px] font-semibold px-3 py-1">
+            <div className="absolute z-[4] top-3 left-3 bg-orange-600 text-white rounded-lg text-[10px] font-semibold px-3 py-1">
               {listing.category || "House"}
             </div>
-            <div className="absolute top-3 right-3 bg-white rounded-lg text-xs font-semibold px-3 py-1">
+            <div className="absolute z-[4] top-3 right-3 bg-white rounded-lg text-xs font-semibold px-3 py-1">
               {listing.purpose || "For Sale"}
-            </div>
-            <div className="absolute bottom-4 right-3 flex items-center gap-1 text-xs">
+            </div>{" "}
+            {/* Add the media switching icons here */}
+            <div className="absolute z-[4] top-12 right-3 flex items-center gap-1 text-xs">
               <span
-                onClick={handlePrevImage}
-                className="h-8 w-8 rounded-full flex items-center justify-center bg-white/50 backdrop-blur-lg cursor-pointer"
+                onClick={() => setShowImages(true)}
+                className={`h-8 w-8 rounded-full flex items-center justify-center backdrop-blur-lg cursor-pointer ${
+                  showImages ? "bg-white" : "bg-white/50"
+                }`}
               >
-                <FaChevronLeft />
+                <FaImage />
               </span>
               <span
-                onClick={handleNextImage}
-                className="h-8 w-8 rounded-full flex items-center justify-center bg-white cursor-pointer"
+                onClick={() => setShowImages(false)}
+                className={`h-8 w-8 rounded-full flex items-center justify-center backdrop-blur-lg cursor-pointer ${
+                  !showImages ? "bg-white" : "bg-white/50"
+                }`}
               >
-                <FaChevronRight />
+                <FaVideo />
               </span>
             </div>
-            <img
-              src={listing.images[currentImageIndex].url}
-              className="h-full w-full rounded-t-2xl object-cover"
-              alt={listing.title}
-            />
+            {showImages ? (
+              // Show images with navigation controls
+              <>
+                <div className="absolute z-[4] bottom-4 right-3 flex items-center gap-1 text-xs">
+                  <span
+                    onClick={handlePrevImage}
+                    className="h-8 w-8 rounded-full flex items-center justify-center bg-white/50 backdrop-blur-lg cursor-pointer"
+                  >
+                    <FaChevronLeft />
+                  </span>
+
+                  <span
+                    onClick={handleNextImage}
+                    className="h-8 w-8 rounded-full flex items-center justify-center bg-white cursor-pointer"
+                  >
+                    <FaChevronRight />
+                  </span>
+                </div>
+
+                <img
+                  src={listing.images[currentImageIndex].url}
+                  className="h-full w-full rounded-t-2xl object-cover"
+                  alt={listing.title}
+                />
+              </>
+            ) : (
+              // Show YouTube video
+              <YouTubeEmbed url={listing.youtubeVideo} />
+            )}
           </section>
+
           <section className="p-6 flex flex-col gap-4">
             <article className="flex flex-col">
               <section className="flex items-center justify-between">
@@ -320,14 +391,14 @@ export default function SingleListing() {
               </section>
               <section className="flex items-center justify-between text-xs text-zinc-600 font-medium">
                 <div className="flex items-center">
-                  <IoLocationOutline />
-                  {listing.location.street}
+                  <IoLocationOutline /> {listing.location.street}
                 </div>
+
                 <section className="flex items-center gap-3">
                   <main className="flex items-center gap-1">
-                    <IoStarOutline />
-                    {listing.averageRating}
+                    <IoStarOutline /> {listing.averageRating}
                   </main>
+
                   <main className="flex items-center gap-1">
                     <IoEyeOutline /> {listing.views}
                   </main>
@@ -339,20 +410,16 @@ export default function SingleListing() {
             </article>
             <article className="flex items-center gap-1 text-[11px]">
               <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
-                <LuBed />
-                {listing.bedrooms} Bedrooms
+                <LuBed /> {listing.bedrooms} Bedrooms
               </span>
               <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
-                <BiShower />
-                {listing.bathrooms} Bathrooms
+                <BiShower /> {listing.bathrooms} Bathrooms
               </span>
               <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
-                <LuToilet />
-                {listing.toilets} Toilets
+                <LuToilet /> {listing.toilets} Toilets
               </span>
               <span className="p-1 rounded-md flex items-center gap-1 bg-zinc-100 px-2">
-                <BiArea />
-                {listing.areaSize}
+                <BiArea /> {listing.areaSize}
                 <TbMeterSquare className="-ml-1" />
               </span>
             </article>
@@ -363,6 +430,7 @@ export default function SingleListing() {
                   <span className="h-8 w-8 rounded-full flex items-center justify-center bg-zinc-100 backdrop-blur-lg cursor-pointer">
                     <LuChevronLeft />
                   </span>
+
                   <span className="h-8 w-8 rounded-full flex items-center justify-center bg-zinc-100 cursor-pointer">
                     <LuChevronRight />
                   </span>
@@ -376,6 +444,7 @@ export default function SingleListing() {
                     className="w-[150px]"
                     loading="lazy"
                   />
+
                   <p className="text-lg font-medium font-primary">
                     No Reviews yet.
                   </p>
@@ -395,6 +464,7 @@ export default function SingleListing() {
                             className="h-full w-full rounded-full object-cover"
                           />
                         </span>
+
                         <section className="flex w-full justify-between">
                           <div className="flex flex-col">
                             <span className="text-xs font-semibold capitalize">
@@ -402,10 +472,12 @@ export default function SingleListing() {
                                 review.user.lastname || ""
                               }`}
                             </span>
+
                             <p className="text-[10px] text-primary font-medium">
                               HouseHunter {review.user.role}
                             </p>
                           </div>
+
                           <div className="flex items-center gap-1 text-[10px] text-yellow-500">
                             {[...Array(5)].map((_, i) => (
                               <span key={i}>
@@ -433,6 +505,7 @@ export default function SingleListing() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                   />
+
                   <Marker position={mapPosition}>
                     <Popup>{listing.location.street}</Popup>
                   </Marker>
@@ -464,10 +537,12 @@ export default function SingleListing() {
                   loading="lazy"
                   alt="verified property"
                 />
+
                 <main className="flex flex-col">
                   <span className="text-sm font-semibold">
                     Property is verified as real
                   </span>
+
                   <span className="text-xs">
                     If reported as fake, we'll investigate to confirm if this
                     listing isn't real.
@@ -480,11 +555,11 @@ export default function SingleListing() {
             </article>
           </section>
         </article>
+
         <article className="w-full max-w-[350px] shrink-0 flex flex-col gap-4">
           <section className="flex flex-col gap-4 p-5 rounded-2xl border border-zinc-200 bg-white items-center w-full">
             <main className="flex items-center justify-between text-lg font-semibold w-full">
-              Agent Profile
-              <FaEllipsisH />
+              Agent Profile <FaEllipsisH />{" "}
             </main>
             <main className="flex flex-col items-center gap-2">
               <span className="h-20 w-20 rounded-full">
@@ -506,26 +581,29 @@ export default function SingleListing() {
                 <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
                   <FaFacebook />
                 </span>
+
                 <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
                   <FaInstagram />
                 </span>
+
                 <span className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">
                   <FaLinkedinIn />
                 </span>
               </div>
               <div className="text-xs text-white bg-primary font-normal flex items-center gap-1 px-6 py-2 rounded-full">
-                <BiPhoneCall />
-                Get in Touch
+                <BiPhoneCall /> Get in Touch
               </div>
             </main>
           </section>
+
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full">
-            <div className="text-lg font-semibold">Request Enquiry</div>
+            <div className="text-lg font-semibold">Request Enquiry</div>{" "}
             <form onSubmit={handleEnquiries} className="flex flex-col gap-2">
               <main className="flex gap-2">
                 <label htmlFor="name" className="text-[11px]">
                   Name
                 </label>
+
                 <input
                   name="name"
                   value={enquiryInput.name}
@@ -541,6 +619,7 @@ export default function SingleListing() {
                 <label htmlFor="email" className="text-[11px]">
                   Email
                 </label>
+
                 <input
                   value={enquiryInput.email}
                   onChange={handleChange}
@@ -556,6 +635,7 @@ export default function SingleListing() {
                 <label htmlFor="number" className="text-[11px]">
                   Number
                 </label>
+
                 <input
                   value={enquiryInput.number}
                   onChange={handleChange}
@@ -571,12 +651,14 @@ export default function SingleListing() {
                 <label htmlFor="message" className="text-[11px]">
                   Message
                 </label>
+
                 <textarea
                   onChange={handleChange}
                   required
                   name="message"
                   id="message"
                   rows={4}
+                  maxLength={300}
                   className="bg-zinc-100 w-full rounded-xl p-2 px-4 placeholder:text-xs placeholder:font-normal placeholder:text-zinc-400 text-xs outline-zinc-200"
                   placeholder="Enter your message"
                   value={enquiryInput.message}
@@ -595,6 +677,7 @@ export default function SingleListing() {
                     </>
                   )}
                 </button>
+
                 <a
                   href={`https://wa.me/2348012345678?text=Hello ${
                     agent.firstname
@@ -612,13 +695,15 @@ export default function SingleListing() {
               </div>
             </form>
           </section>
+
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
-            <div className="text-lg font-semibold">Property Details</div>
+            <div className="text-lg font-semibold">Property Details</div>{" "}
             <main className="flex flex-col gap-1">
               <section className="flex items-center gap-1 w-full justify-between">
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Price
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   &#8358;{listing.price.toLocaleString()}
                 </main>
@@ -627,6 +712,7 @@ export default function SingleListing() {
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Property Type
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   {listing.category}
                 </main>
@@ -635,6 +721,7 @@ export default function SingleListing() {
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Building Size
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   {listing.areaSize}
                 </main>
@@ -643,6 +730,7 @@ export default function SingleListing() {
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Bedrooms
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   {listing.bedrooms}
                 </main>
@@ -651,6 +739,7 @@ export default function SingleListing() {
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Bathrooms
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   {listing.bathrooms}
                 </main>
@@ -659,13 +748,16 @@ export default function SingleListing() {
                 <main className="w-full max-w-[90%] bg-zinc-100 p-2 px-4 rounded-lg">
                   Toilets
                 </main>
+
                 <main className="w-full bg-zinc-100 rounded-lg p-2 px-4">
                   {listing.toilets}
                 </main>
               </section>
             </main>
           </section>
+
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full text-[11px]">
+            {" "}
             <div className="text-lg font-semibold">Features</div>
             <main className="w-full flex flex-wrap gap-1.5">
               {listing.features.map((feature, index) => (
@@ -678,7 +770,7 @@ export default function SingleListing() {
           </section>
 
           <section className="flex flex-col gap-4 p-4 rounded-2xl border border-zinc-200 bg-white w-full">
-            <div className="text-lg font-semibold">Write a review</div>
+            <div className="text-lg font-semibold">Write a review</div>{" "}
             <div
               className="flex items-center gap-1.5 -mt-2 text-xl cursor-pointer"
               onMouseLeave={() => setHoveredRating(0)}
@@ -691,6 +783,7 @@ export default function SingleListing() {
                     onClick={() => handleRatingChange(ratingValue)}
                     onMouseEnter={() => setHoveredRating(ratingValue)}
                   >
+                    {" "}
                     {ratingValue <= reviewInput.rating ||
                     ratingValue <= hoveredRating ? (
                       <FaStar className="text-yellow-500 transition-all duration-200" />
@@ -720,6 +813,7 @@ export default function SingleListing() {
                 <label htmlFor="email" className="text-[11px]">
                   Email
                 </label>
+
                 <input
                   value={reviewInput.email}
                   onChange={handleReviewInputChange}
@@ -730,11 +824,11 @@ export default function SingleListing() {
                   placeholder="Enter email address"
                 />
               </main>
-
               <main className="flex gap-2">
                 <label htmlFor="message" className="text-[11px]">
                   Message
                 </label>
+
                 <textarea
                   onChange={handleReviewInputChange}
                   required

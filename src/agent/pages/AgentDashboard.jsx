@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function AgentDashboard() {
-  return (
-    <div>AgentDashboard</div>
-  )
+  return <div className="h-dvh">AgentDashboard</div>;
 }

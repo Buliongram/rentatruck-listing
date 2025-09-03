@@ -15,16 +15,17 @@ import { Link } from "react-router-dom";
 import Loader from "../../components/Loader";
 import { FaXmark } from "react-icons/fa6";
 import toast from "react-hot-toast";
+import { format, parseISO } from "date-fns";
 
 const API_URL =
   window.location.hostname === "localhost"
     ? `http://localhost:5000/api`
     : `https://rentahome-server.onrender.com/api`;
 
-export default function AdminContacts() {
+export default function AdminTransactions() {
   const user = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
-  const [contactToDelete, setContactToDelete] = useState(null);
+  const [transactionToDelete, setTransactionToDelete] = useState(null);
   const [toggleDelete, setToggleDelete] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,90 +33,107 @@ export default function AdminContacts() {
     modal: false,
     message: "",
   });
-  const cacheKey = `househunter-contact-cache-admin-dashboard-${user._id}`;
-  const [contacts, setContacts] = useState([]);
-  const [filteredContacts, setFilteredContacts] = useState([]);
+  const cacheKey = `househunter-transaction-cache-admin-dashboard-${user._id}`;
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
 
-  const categories = [{ name: "All" }, { name: "Unread" }, { name: "Read" }];
+  const categories = [
+    { name: "All" },
+    { name: "Pending" },
+    { name: "Successful" },
+    { name: "Failed" },
+  ];
 
   useEffect(() => {
-    const fetchContacts = async () => {
+    const fetchTransactions = async () => {
       setLoading(true);
       const cached = JSON.parse(localStorage.getItem(cacheKey));
       try {
         const {
           data: { lastUpdated },
-        } = await axios.get(`${API_URL}/timestamp/contact/updatedAt`, {
+        } = await axios.get(`${API_URL}/timestamp/transaction/updatedAt`, {
           withCredentials: true,
         });
 
         if (cached && cached.lastUpdated === lastUpdated) {
-          setContacts(cached.data);
+          setTransactions(cached.data);
           return;
         }
-        const { data } = await axios.get(`${API_URL}/contact/fetch`, {
+        const { data } = await axios.get(`${API_URL}/transaction/fetch`, {
           withCredentials: true,
         });
-        setContacts(data);
+        setTransactions(data);
         localStorage.setItem(cacheKey, JSON.stringify({ data, lastUpdated }));
       } catch (err) {
-        toast.error("Failed to fetch contact messages.", { id: "123" });
+        toast.error("Failed to fetch transactions.", { id: "123" });
       } finally {
         setLoading(false);
       }
     };
-    fetchContacts();
+    fetchTransactions();
   }, [cacheKey]);
 
   useEffect(() => {
-    let filtered = contacts;
-    if (statusFilter === "Read") {
-      filtered = contacts.filter((contact) => contact.isRead);
-    } else if (statusFilter === "Unread") {
-      filtered = contacts.filter((contact) => !contact.isRead);
+    let filtered = transactions;
+    if (statusFilter === "Pending") {
+      filtered = transactions.filter(
+        (transaction) => transaction.status === "pending"
+      );
+    } else if (statusFilter === "Successful") {
+      filtered = transactions.filter(
+        (transaction) =>
+          transaction.status === "successful" ||
+          transaction.status === "completed"
+      );
+    } else if (statusFilter === "Failed") {
+      filtered = transactions.filter(
+        (transaction) => transaction.status === "failed"
+      );
     }
 
     if (searchTerm) {
       filtered = filtered.filter(
-        (contact) =>
-          contact.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          contact.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          contact.message.toLowerCase().includes(searchTerm.toLowerCase())
+        (transaction) =>
+          transaction.reference
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          transaction.amount.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          transaction.plan.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          transaction.currency.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    setFilteredContacts(filtered);
-  }, [statusFilter, contacts, searchTerm]);
+    setFilteredTransactions(filtered);
+  }, [statusFilter, transactions, searchTerm]);
 
-  const confirmDelete = (contactId) => {
-    setContactToDelete(contactId);
+  const confirmDelete = (transactionId) => {
+    setTransactionToDelete(transactionId);
     setToggleDelete(true);
   };
 
-  const handleContactDelete = async () => {
-    if (!contactToDelete) return;
-    toast.loading("Deleting contact message...", { id: "deleteToast" });
+  const handleTransactionToDelete = async () => {
+    if (!transactionToDelete) return;
+    toast.loading("Deleting transaction...", { id: "deleteToast" });
     try {
       const res = await axios.post(
-        `${API_URL}/contact/delete`,
-        { contactId: contactToDelete },
+        `${API_URL}/transaction/delete`,
+        { transactionId: transactionToDelete },
         { withCredentials: true }
       );
       const data = res.data;
       if (data.error) {
         toast.error(data.message, { id: "deleteToast" });
       } else {
-        const { contacts, lastUpdated } = data;
-        setContacts(contacts);
+        const { transactions, lastUpdated } = data;
+        setTransactions(transactions);
         localStorage.setItem(
           cacheKey,
-          JSON.stringify({ data: contacts, lastUpdated })
+          JSON.stringify({ data: transactions, lastUpdated })
         );
-        toast.success("Contact message deleted successfully.", {
+        toast.success("Transaction deleted successfully.", {
           id: "deleteToast",
         });
         setToggleDelete(false);
-        setContactToDelete(null);
+        setTransactionToDelete(null);
       }
     } catch (error) {
       console.log(error);
@@ -135,17 +153,19 @@ export default function AdminContacts() {
     }
   };
 
-  const handleMarkAsRead = async (contactId) => {
+  const handleMarkAsRead = async (transactionId) => {
     try {
       await axios.post(
-        `${API_URL}/contact/mark-read`,
-        { contactId },
+        `${API_URL}/transaction/mark-read`,
+        { transactionId },
         { withCredentials: true }
       );
 
-      setContacts((prev) =>
-        prev.map((contact) =>
-          contact._id === contactId ? { ...contact, isRead: true } : contact
+      setTransactions((prev) =>
+        prev.map((transaction) =>
+          transaction._id === transactionId
+            ? { ...transaction, isRead: true }
+            : transaction
         )
       );
     } catch (error) {
@@ -154,10 +174,13 @@ export default function AdminContacts() {
   };
 
   const tableHeaders = [
-    "Full Name",
-    "Phone Number",
-    "Email",
-    "Country",
+    "Date Created",
+    "Reference",
+    "Transaction ID",
+    "Amount",
+    "Plan",
+    "Currency",
+    "User",
     "Status",
     "Action",
   ];
@@ -165,7 +188,7 @@ export default function AdminContacts() {
   if (loading) {
     return <Loader />;
   }
-  if (!contacts || contacts.length < 1) {
+  if (!transactions || transactions.length < 1) {
     return <NoRecord />;
   }
 
@@ -174,9 +197,9 @@ export default function AdminContacts() {
       <article className="flex flex-col gap-5">
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
           <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
-            Contact Messages{" "}
+            Transactions{" "}
             <span className="text-white bg-zinc-950 p-1 px-2 rounded-lg text-xs">
-              {contacts.length}
+              {transactions.length}
             </span>
           </span>
           <section className="flex items-center justify-between pt-4">
@@ -222,27 +245,45 @@ export default function AdminContacts() {
               </tr>
             </thead>
             <tbody className="mt-4">
-              {filteredContacts.map((contact) => (
-                <tr key={contact._id} className="table-row">
-                  <td>{contact.fullname}</td>
-                  <td>{contact.number}</td>
-                  <td>{contact.email}</td>
-                  <td>{contact.country}</td>
-
+              {filteredTransactions.map((transaction) => (
+                <tr key={transaction._id} className="table-row">
                   <td>
+                    {format(parseISO(transaction.createdAt), "E, d MMMM yyyy")}
+                  </td>
+                  <td>{transaction.reference}</td>
+                  <td>{transaction.transactionId}</td>
+                  <td>&#8358;{transaction.amount.toLocaleString()}</td>
+                  <td>{transaction.plan}</td>
+                  <td>{transaction.currency}</td>
+                  <td>
+                    {" "}
+                    <Link
+                      to={`/agent/${transaction.userId._id}`}
+                      className="flex items-center gap-1"
+                    >
+                      <span className="h-5 w-5 rounded-full">
+                        <img
+                          src={transaction.userId.profilePhoto}
+                          className="h-full w-full rounded-full"
+                          alt={transaction.userId.firstname}
+                        />
+                      </span>
+                      {transaction.userId.firstname}
+                    </Link>
+                  </td>
+                  <td>
+                    {" "}
                     <span
                       className={`px-3 rounded-full w-max py-0.5 flex items-center gap-1 ${
-                        contact.isRead
-                          ? "bg-green-100 text-green-950"
-                          : "bg-amber-100"
+                        {
+                          successful: "text-green-100 bg-green-500",
+                          completed: "text-green-100 bg-green-500",
+                          failed: "text-[#fe0000] bg-red-100",
+                          pending: "text-amber-400 bg-amber-100",
+                        }[transaction.status] || "bg-gray-300"
                       }`}
                     >
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          contact.isRead ? "bg-green-500" : "bg-amber-500"
-                        }`}
-                      ></span>
-                      <p>{contact.isRead ? "Read" : "Unread"}</p>
+                      {transaction.status}
                     </span>
                   </td>
 
@@ -252,16 +293,16 @@ export default function AdminContacts() {
                         onClick={() => {
                           setToggleMessage({
                             modal: true,
-                            message: contact.message,
+                            message: transaction.message,
                           });
-                          handleMarkAsRead(contact._id);
+                          handleMarkAsRead(transaction._id);
                         }}
                         className="h-6 w-6 rounded-md flex items-center justify-center border bg-zinc-950 text-white border-zinc-200 cursor-pointer"
                       >
                         <MdOutlineMessage />
                       </span>
                       <span
-                        onClick={() => confirmDelete(contact._id)}
+                        onClick={() => confirmDelete(transaction._id)}
                         className="h-6 w-6 rounded-md flex items-center justify-center border bg-[#f30000] text-white border-zinc-200 cursor-pointer"
                       >
                         <IoTrashOutline />
@@ -279,7 +320,7 @@ export default function AdminContacts() {
           <section
             className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[450px] w-full fixed md:relative bottom-0 `}
           >
-            <h2 className="font-semibold text-xl">Contact Message</h2>
+            <h2 className="font-semibold text-xl">transaction Message</h2>
             <p className="text-sm font-medium text-center bg-zinc-100 p-4 rounded-2xl">
               {toggleMessage.message}
             </p>
@@ -297,12 +338,12 @@ export default function AdminContacts() {
       {toggleDelete && (
         <section className="fixed h-full w-full top-0 left-0 bg-black/60 flex items-center justify-center z-50">
           <section
-            className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[450px] w-full fixed md:relative bottom-0 `}
+            className={`flex flex-col items-center gap-6 p-6 pb-4 md:pb-6 rounded-t-3xl md:rounded-3xl bg-white transition-all delay-75 md:max-w-[470px] w-full fixed md:relative bottom-0 `}
           >
             <h2 className="font-semibold text-xl">Are you sure?</h2>
             <p className="text-sm font-medium text-center bg-zinc-100 p-4 rounded-2xl">
-              Deleting this contact is permanent and irreversible. You will lose
-              this record.
+              Deleting this transaction is permanent and irreversible. You will
+              lose this record.
             </p>
 
             <div className="flex items-center w-full gap-4">
@@ -313,10 +354,10 @@ export default function AdminContacts() {
                 Cancel
               </span>
               <button
-                onClick={handleContactDelete}
+                onClick={handleTransactionToDelete}
                 className="flex text-xs items-center justify-center shrink gap-2 text-white bg-[#f30000] font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
-                Yes, delete this contact
+                Yes, delete this transaction
               </button>
             </div>
 

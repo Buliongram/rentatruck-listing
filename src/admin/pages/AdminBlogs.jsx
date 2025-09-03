@@ -215,14 +215,14 @@ export default function AdminBlogs() {
           <section className="flex items-center justify-between">
             <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
               Blogs{" "}
-              <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+              <span className="text-white bg-zinc-950 p-1 px-2 rounded-lg text-xs">
                 {blogs.length}
               </span>
             </span>
 
             <Link
               to={"/admin/blog/create"}
-              className="rounded-xl px-6 py-2.5 flex items-center gap-1 cursor-pointer transition duration-200 bg-blue-600 text-white text-xs"
+              className="rounded-xl px-6 py-2.5 flex items-center gap-1 cursor-pointer transition duration-200 bg-zinc-950 text-white text-xs"
             >
               <FaRegNewspaper /> Create Blog
             </Link>
@@ -238,14 +238,14 @@ export default function AdminBlogs() {
                 className="placeholder:text-xs outline-none bg-transparent text-sm text-zinc-500 pr-6"
               />
             </main>
-            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-blue-600">
+            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-zinc-950">
               {categories.map((filter) => (
                 <span
                   key={filter.name}
                   onClick={() => setStatusFilter(filter.name)}
                   className={`rounded-xl px-6 py-1.5 cursor-pointer transition duration-200 ${
                     statusFilter === filter.name
-                      ? "bg-blue-600 text-white"
+                      ? "bg-zinc-950 text-white"
                       : "hover:bg-white"
                   }`}
                 >
@@ -274,32 +274,36 @@ export default function AdminBlogs() {
                   <td>{format(parseISO(blog.createdAt), "E, d MMMM yyyy")}</td>
                   <td>{blog.title}</td>
                   <td>{blog.author}</td>
-                  <td>{`${blog.excerpt.slice(0, 50)}...`}</td>
+                  <td>{`${blog.excerpt.slice(0, 50)}...`}</td> {" "}
                   <td>
-                    <Link
-                      to={blog.thumbnail.url}
-                      className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
-                    >
-                      <img
-                        src={blog.thumbnail.url}
-                        alt={blog.title}
-                        className="h-full w-full object-cover rounded-lg"
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <main className="flex items-center gap-1">
+                    {blog.thumbnail && blog.thumbnail.url && (
                       <Link
-                        to={blog.images[0].url}
+                        to={blog.thumbnail.url}
                         className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
                       >
                         <img
-                          src={blog.images[0].url}
+                          src={blog.thumbnail.url}
                           alt={blog.title}
                           className="h-full w-full object-cover rounded-lg"
                         />
                       </Link>
-                      {blog.images[1] ? (
+                    )}
+                  </td>
+                  <td>
+                    <main className="flex items-center gap-1">
+                      {blog.images[0] && blog.images[0].url && (
+                        <Link
+                          to={blog.images[0].url}
+                          className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
+                        >
+                          <img
+                            src={blog.images[0].url}
+                            alt={blog.title}
+                            className="h-full w-full object-cover rounded-lg"
+                          />
+                        </Link>
+                      )}
+                      {blog.images[1] && blog.images[1].url && (
                         <Link
                           to={blog.images[1].url}
                           className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
@@ -310,11 +314,8 @@ export default function AdminBlogs() {
                             className="h-full w-full object-cover rounded-lg"
                           />
                         </Link>
-                      ) : (
-                        ""
                       )}
-
-                      {blog.images[2] ? (
+                      {blog.images[2] && blog.images[2].url && (
                         <Link
                           to={blog.images[2].url}
                           className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
@@ -325,23 +326,6 @@ export default function AdminBlogs() {
                             className="h-full w-full object-cover rounded-lg"
                           />
                         </Link>
-                      ) : (
-                        ""
-                      )}
-
-                      {blog.images[3] ? (
-                        <Link
-                          to={blog.images[3].url}
-                          className="h-8 w-8 rounded-lg flex border border-zinc-200 shrink"
-                        >
-                          <img
-                            src={blog.images[3].url}
-                            alt={blog.title}
-                            className="h-full w-full object-cover rounded-lg"
-                          />
-                        </Link>
-                      ) : (
-                        ""
                       )}
                     </main>
                   </td>
@@ -363,7 +347,6 @@ export default function AdminBlogs() {
                       <p className="capitalize">{blog.status}</p>
                     </span>
                   </td>
-
                   <td>
                     <div className="flex items-center gap-2 text-xs">
                       <Link
@@ -379,7 +362,7 @@ export default function AdminBlogs() {
                             content: blog.content,
                           });
                         }}
-                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-blue-600 text-white border-zinc-200 cursor-pointer"
+                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-zinc-950 text-white border-zinc-200 cursor-pointer"
                       >
                         <MdOutlineMessage />
                       </span>
@@ -453,7 +436,7 @@ export default function AdminBlogs() {
             <div className="flex items-center w-full gap-4">
               <span
                 onClick={() => setToggleDelete(false)}
-                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Cancel
               </span>
@@ -486,13 +469,13 @@ export default function AdminBlogs() {
             <div className="flex items-center w-full gap-4">
               <span
                 onClick={() => setToggleStatus(false)}
-                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Cancel
               </span>
               <button
                 onClick={handleBlogStatus}
-                className="flex text-xs items-center justify-center shrink gap-2 text-white bg-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center shrink gap-2 text-white bg-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Yes, proceed
               </button>

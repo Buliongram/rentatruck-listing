@@ -35,9 +35,9 @@ import Preloader from "./components/Preloader";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./assets/store/userSlice";
 import axios from "axios";
-
-
-
+import AgentSubscription from "./agent/pages/AgentSubscription";
+import AgentTransactions from "./agent/pages/AgentTransactions";
+import AdminTransactions from "./admin/pages/AdminTransactions";
 
 const AdminSidebar = lazy(() => import("./admin/components/AdminSidebar"));
 const CreateBlog = lazy(() => import("./admin/pages/CreateBlog"));
@@ -192,9 +192,9 @@ export default function App() {
     return (
       <Suspense fallback={<Preloader />}>
         <AgentSidebar />
-        <section className=" bg-zinc-100/60 p-4 ">
+        <section className="lg:ml-[200px] bg-zinc-100/60 p-4">
           <AgentHeader />
-          <main className="mt-4 min-h-dvh ">
+          <main className="mt-4 ">
             <Outlet />
           </main>
         </section>
@@ -268,6 +268,8 @@ export default function App() {
         { path: "/admin/blogs", element: <AdminBlogs /> },
         { path: "/admin/contacts", element: <AdminContacts /> },
         { path: "/admin/reviews", element: <AdminReviews /> },
+        { path: "/admin/transactions", element: <AdminTransactions /> },
+        { path: "/admin/subscriptions", element: <AdminReviews /> },
       ],
     },
     {
@@ -277,6 +279,8 @@ export default function App() {
         { path: "/agency", element: <AgentDashboard /> },
         { path: "/agency/listings", element: <AdminListings /> },
         { path: "/agency/listing/create", element: <CreateListing /> },
+        { path: "/agency/subscriptions", element: <AgentSubscription /> },
+        { path: "/agency/transactions", element: <AgentTransactions /> },
       ],
     },
   ]);

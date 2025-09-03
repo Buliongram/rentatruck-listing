@@ -402,7 +402,7 @@ export default function EditListing() {
                 onClick={() => handlePurposeChange(item)}
                 className={`w-full py-2.5 text-center rounded-xl border border-transparent text-xs cursor-pointer ${
                   formData.purpose === item
-                    ? "bg-blue-600 text-white"
+                    ? "bg-zinc-950 text-white"
                     : "bg-white border-zinc-200"
                 }`}
               >
@@ -838,7 +838,7 @@ export default function EditListing() {
       </article>
       <button
         type="submit"
-        className="w-full py-2 bg-blue-600 cursor-pointer text-white rounded-xl font-semibold text-sm hover:bg-blue-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[200px]"
+        className="w-full py-2 bg-zinc-950 cursor-pointer text-white rounded-xl font-semibold text-sm hover:bg-blue-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[200px]"
         disabled={loading}
       >
         {loading ? "Updating..." : "Update Listing"}

@@ -36,7 +36,7 @@ export default function AdminLeads() {
   const [enquiries, setEnquiries] = useState([]);
   const [filteredEnquiries, setFilteredEnquiries] = useState([]);
 
-  const categories = [{ name: "All" }, { name: "Active" }, { name: "Read" }];
+  const categories = [{ name: "All" }, { name: "Unread" }, { name: "Read" }];
 
   useEffect(() => {
     const fetchEnquiries = async () => {
@@ -114,22 +114,22 @@ export default function AdminLeads() {
         setToggleDelete(false);
         setEnquiryToDelete(null);
       }
-    }  catch (error) {
-          console.log(error);
-          if (error.response?.data) {
-            toast.error(
-              error.response.data.message ||
-                "Unable to process your request. Please try again",
-              {
-                id: "deleteToast",
-              }
-            );
-          } else {
-            toast.error("An unknown error occured. Please try again.", {
-              id: "deleteToast",
-            });
+    } catch (error) {
+      console.log(error);
+      if (error.response?.data) {
+        toast.error(
+          error.response.data.message ||
+            "Unable to process your request. Please try again",
+          {
+            id: "deleteToast",
           }
-        }
+        );
+      } else {
+        toast.error("An unknown error occured. Please try again.", {
+          id: "deleteToast",
+        });
+      }
+    }
   };
 
   const handleMarkAsRead = async (enquiryId) => {
@@ -150,6 +150,16 @@ export default function AdminLeads() {
     }
   };
 
+  const tableHeaders = [
+    "Name",
+    "Phone Number",
+    "Email",
+    "Country",
+    "Agent",
+    "Status",
+    "Property ID",
+    "Action",
+  ];
   if (loading) {
     return <Loader />;
   }
@@ -163,7 +173,7 @@ export default function AdminLeads() {
         <main className="flex flex-col divide-y divide-zinc-200 w-full p-5 bg-white rounded-3xl">
           <span className="text-2xl flex items-center gap-2 font-semibold pb-6">
             Enquiries{" "}
-            <span className="text-white bg-blue-600 p-1 px-2 rounded-lg text-xs">
+            <span className="text-white bg-zinc-950 p-1 px-2 rounded-lg text-xs">
               {enquiries.length}
             </span>
           </span>
@@ -178,14 +188,14 @@ export default function AdminLeads() {
                 className="placeholder:text-xs outline-none bg-transparent text-sm text-zinc-500 pr-6"
               />
             </main>
-            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-blue-600">
+            <main className="flex items-center p-1 rounded-2xl w-max text-xs border-[1.5px] border-zinc-950">
               {categories.map((filter) => (
                 <span
                   key={filter.name}
                   onClick={() => setStatusFilter(filter.name)}
                   className={`rounded-xl px-6 py-1.5 cursor-pointer transition duration-200 ${
                     statusFilter === filter.name
-                      ? "bg-blue-600 text-white"
+                      ? "bg-zinc-950 text-white"
                       : "hover:bg-white"
                   }`}
                 >
@@ -199,47 +209,15 @@ export default function AdminLeads() {
         <main className="flex flex-col w-full bg-white rounded-3xl p-4">
           <table>
             <thead>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Name <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Phone Number <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Email <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Country <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Agent <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Status
-                  <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Property ID <HiOutlineChevronUpDown />
-                </div>
-              </th>
-              <th>
-                <div className="flex items-center gap-0.5">
-                  Action <HiOutlineChevronUpDown />
-                </div>
-              </th>
+              <tr>
+                {tableHeaders.map((header, index) => (
+                  <th key={header}>
+                    <div className="flex items-center gap-0.5">
+                      {header} <HiOutlineChevronUpDown />
+                    </div>
+                  </th>
+                ))}
+              </tr>
             </thead>
             <tbody className="mt-4">
               {filteredEnquiries.map((enquiry) => (
@@ -297,7 +275,7 @@ export default function AdminLeads() {
                           });
                           handleMarkAsRead(enquiry._id);
                         }}
-                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-blue-600 text-white border-zinc-200 cursor-pointer"
+                        className="h-6 w-6 rounded-md flex items-center justify-center border bg-zinc-950 text-white border-zinc-200 cursor-pointer"
                       >
                         <MdOutlineMessage />
                       </span>
@@ -349,7 +327,7 @@ export default function AdminLeads() {
             <div className="flex items-center w-full gap-4">
               <span
                 onClick={() => setToggleDelete(false)}
-                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-blue-600 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
+                className="flex text-xs items-center justify-center gap-2 border border-zinc-300 text-zinc-950 font-semibold w-full p-2.5 px-6 rounded-xl outline-none cursor-pointer"
               >
                 Cancel
               </span>

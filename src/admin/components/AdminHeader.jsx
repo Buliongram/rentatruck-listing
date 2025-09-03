@@ -138,8 +138,8 @@ export default function AdminHeader() {
         to={path}
         className={`flex items-center gap-0.5 text-xs px-3 py-2.5 rounded-xl font-semibold ${
           location.pathname === path
-            ? "bg-blue-600 text-white "
-            : "bg-zinc-100/60 hover:bg-blue-600 text-zinc-600 hover:text-white"
+            ? "bg-zinc-950 text-white "
+            : "bg-zinc-100/60 hover:bg-zinc-950 text-zinc-600 hover:text-white"
         } `}
       >
         {icon}
@@ -255,8 +255,8 @@ export default function AdminHeader() {
         to={path}
         className={`flex items-center gap-0.5 text-xs px-3 py-1.5 rounded-xl font-semibold relative ${
           location.pathname === path
-            ? "bg-blue-600 text-white "
-            : "bg-zinc-100/60 hover:bg-blue-600 text-zinc-600 hover:text-white"
+            ? "bg-zinc-950 text-white "
+            : "bg-zinc-100/60 hover:bg-zinc-950 text-zinc-600 hover:text-white"
         } `}
       >
         {count !== "" && count > 0 ? (
@@ -274,10 +274,10 @@ export default function AdminHeader() {
   return (
     <header className="flex items-center justify-between bg-white p-3 rounded-2xl relative">
       {/* <Link to={"/"} className="flex items-center gap-1">
-        <span className="h-8 w-8 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center">
+        <span className="h-8 w-8 rounded-xl text-[16px] bg-zinc-950 text-white flex items-center justify-center">
           <FaMagento />
         </span>
-        <div className="text-lg font-semibold text-blue-600 font-primary mt-1">
+        <div className="text-lg font-semibold text-zinc-950 font-primary mt-1">
           HouseHunter
         </div>
       </Link> */}

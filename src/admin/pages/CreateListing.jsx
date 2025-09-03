@@ -27,8 +27,8 @@ export default function CreateListing() {
     price: "",
     denomination: "",
     installment: "",
-    youtubeLink: "",
-    instagramLink: "",
+    youtubeVideo: "",
+    instagramVideo: "",
     features: [],
     images: [],
   });
@@ -67,13 +67,13 @@ export default function CreateListing() {
       return match ? match[1] : null;
     };
 
-    const videoId = extractYoutubeVideoId(formData.youtubeLink);
+    const videoId = extractYoutubeVideoId(formData.youtubeVideo);
     if (videoId) {
       setYoutubeEmbedUrl(`https://www.youtube.com/embed/${videoId}`);
     } else {
       setYoutubeEmbedUrl(""); // Clear the embed if the URL is invalid
     }
-  }, [formData.youtubeLink]);
+  }, [formData.youtubeVideo]);
 
   useEffect(() => {
     const fetchInstagramEmbed = async (url) => {
@@ -90,12 +90,12 @@ export default function CreateListing() {
       }
     };
 
-    if (formData.instagramLink) {
-      fetchInstagramEmbed(formData.instagramLink);
+    if (formData.instagramVideo) {
+      fetchInstagramEmbed(formData.instagramVideo);
     } else {
       setInstagramEmbedHtml(null); // Clear the embed if the URL is empty
     }
-  }, [formData.instagramLink]);
+  }, [formData.instagramVideo]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -175,7 +175,6 @@ export default function CreateListing() {
     try {
       const formDataPayload = new FormData();
 
-
       for (const key in formData) {
         if (key === "images" || key === "streetAddress") {
           continue;
@@ -239,8 +238,8 @@ export default function CreateListing() {
         //   price: "",
         //   denomination: "",
         //   installment: "",
-        //   youtubeLink: "",
-        //   instagramLink: "",
+        //   youtubeVideo: "",
+        //   instagramVideo: "",
         //   features: [],
         //   images: [],
         // });
@@ -307,7 +306,7 @@ export default function CreateListing() {
                 onClick={() => handlePurposeChange(item)}
                 className={`w-full py-2.5 text-center rounded-xl border border-transparent text-xs cursor-pointer ${
                   formData.purpose === item
-                    ? "bg-blue-600 text-white"
+                    ? "bg-zinc-950 text-white"
                     : "bg-white border-zinc-200"
                 }`}
               >
@@ -627,8 +626,8 @@ export default function CreateListing() {
           <span className="text-sm font-semibold">Youtube Video</span>
           <input
             type="url"
-            name="youtubeLink"
-            value={formData.youtubeLink}
+            name="youtubeVideo"
+            value={formData.youtubeVideo}
             onChange={handleChange}
             className="bg-zinc-50 border border-zinc-200 w-full rounded-xl p-3 px-4 text-xs font-medium placeholder:text-xs placeholder:text-zinc-400 placeholder:font-normal outline-zinc-200"
             placeholder="paste youtube video link"
@@ -655,8 +654,8 @@ export default function CreateListing() {
           <span className="text-sm font-semibold">Instagram Video</span>
           <input
             type="url"
-            name="instagramLink"
-            value={formData.instagramLink}
+            name="instagramVideo"
+            value={formData.instagramVideo}
             onChange={handleChange}
             className="bg-zinc-50 border border-zinc-200 w-full rounded-xl p-3 px-4 text-xs font-medium placeholder:text-xs placeholder:text-zinc-400 placeholder:font-normal outline-zinc-200"
             placeholder="paste instagram video link"
@@ -727,7 +726,7 @@ export default function CreateListing() {
       </article>
       <button
         type="submit"
-        className="w-full py-2 bg-blue-600 cursor-pointer text-white rounded-xl font-semibold text-sm hover:bg-blue-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[200px]"
+        className="w-full py-2 bg-zinc-950 cursor-pointer text-white rounded-xl font-semibold text-sm hover:bg-blue-800 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[200px]"
         disabled={loading}
       >
         {loading ? "Submitting..." : "Create Listing"}

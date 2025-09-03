@@ -122,9 +122,12 @@ export default function UserDasboard() {
           setLoading({ type: "reviews", status: false });
           return;
         }
-        const { data:fetchedReviews } = await axios.get(`${API_URL}/reviews/fetch/user`, {
-          withCredentials: true,
-        });
+        const { data: fetchedReviews } = await axios.get(
+          `${API_URL}/reviews/fetch/user`,
+          {
+            withCredentials: true,
+          }
+        );
         const data = fetchedReviews.filter(
           (review) => review.status === "published"
         );
@@ -235,7 +238,7 @@ export default function UserDasboard() {
               <span className="text-[16px] font-semibold">Saved Listings</span>
               <Link
                 to={"/dashboard/saved-items"}
-                className="text-xs bg-blue-600 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
+                className="text-xs bg-zinc-950 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
               >
                 <IoEyeOutline /> View all
               </Link>
@@ -297,20 +300,20 @@ export default function UserDasboard() {
                                       {house?.title}
                                     </h3>
                                     <ShareButton
-                                      color={"blue-600"}
+                                      color={"zinc-950"}
                                       listingTitle={house?.title}
                                       listingUrl={`https://your-domain.com/listing/single/${house?._id}`}
                                     />
                                   </section>
                                   <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                                    <FaLocationDot className="text-blue-600" />
+                                    <FaLocationDot className="text-zinc-950" />
                                     {house?.location.area +
                                       ", " +
                                       house?.location.state}
                                   </p>
                                 </article>
                                 <article className="flex items-center justify-between pt-2">
-                                  <h3 className="text-xs font-semibold font-primary text-blue-600">
+                                  <h3 className="text-xs font-semibold font-primary text-zinc-950">
                                     &#8358;{house?.price.toLocaleString()}
                                   </h3>
                                 </article>
@@ -362,7 +365,7 @@ export default function UserDasboard() {
               <span className="text-[16px] font-semibold">Your reviews</span>
               <Link
                 to={"/dashboard/reviews"}
-                className="text-xs bg-blue-600 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
+                className="text-xs bg-zinc-950 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
               >
                 <IoEyeOutline /> View all
               </Link>
@@ -456,7 +459,7 @@ export default function UserDasboard() {
               <span className="text-sm font-semibold">Latest Properties</span>
               <Link
                 to={"/dashboard/listings"}
-                className="text-xs bg-blue-600 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
+                className="text-xs bg-zinc-950 text-white px-3 rounded-full py-1.5 w-max flex items-center gap-0.5"
               >
                 <IoEyeOutline /> View all
               </Link>
@@ -485,11 +488,11 @@ export default function UserDasboard() {
                           />
                         </article>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-blue-600">
+                          <span className="text-xs font-semibold text-zinc-950">
                             &#8358;{listing.price.toLocaleString()}
                           </span>
                           <div className="flex items-center gap-1 text-[11px] font-medium bg-zinc-100 px-2 py-0.5 rounded-full">
-                            <span className="h-1 w-1 rounded-full bg-blue-600"></span>
+                            <span className="h-1 w-1 rounded-full bg-zinc-950"></span>
                             {listing.purpose}
                           </div>
                         </div>

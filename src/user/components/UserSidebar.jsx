@@ -76,7 +76,7 @@ export default function UserSidebar() {
         to={path}
         className={`px-4 py-2 text-xs rounded-xl  flex items-center gap-1 border-b border-transparent font-semibold ${
           location.pathname === path
-            ? "bg-blue-600 text-white"
+            ? "bg-zinc-950 text-white"
             : "text-zinc-700 hover:bg-zinc-100/70"
         } `}
       >
@@ -89,10 +89,10 @@ export default function UserSidebar() {
     <>
       <section className="fixed w-[200px] bg-white top-0 left-0 h-full flex flex-col justify-between p-4 py-6 items-center">
         <Link to={"/"} className="flex items-center gap-1">
-          <span className="h-8 w-8 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center">
+          <span className="h-8 w-8 rounded-xl text-[16px] bg-zinc-950 text-white flex items-center justify-center">
             <FaMagento />
           </span>
-          <div className="text-lg font-semibold text-blue-600 font-primary mt-1">
+          <div className="text-lg font-semibold text-zinc-950 font-primary mt-1">
             HouseHunter
           </div>
         </Link>
@@ -102,13 +102,13 @@ export default function UserSidebar() {
         </section>
 
         <div className="flex flex-col gap-3 rounded-3xl p-3 relative">
-          <span className="h-9 w-9 rounded-xl text-[16px] bg-blue-600 text-white flex items-center justify-center relative z-10">
+          <span className="h-9 w-9 rounded-xl text-[16px] bg-zinc-950 text-white flex items-center justify-center relative z-10">
             <FaCrown />
           </span>
           <span className="text-xs font-medium leading-tight text-white relative z-10">
             Subscribe to unlock more powerful and streamlined features
           </span>
-          <span className="text-xs bg-blue-600 text-white px-6 rounded-full py-2 w-max relative z-10">
+          <span className="text-xs bg-zinc-950 text-white px-6 rounded-full py-2 w-max relative z-10">
             Subscribe Now!
           </span>
           <img

@@ -28,7 +28,7 @@ export default function Profile() {
           <section className="flex items-center gap-2">
             <form
               encType="multipart/form-data"
-              className="h-14 w-14 lg:h-20 lg:w-20 rounded-full bg-[#f5f5f3] flex items-center justify-center text-blue-600 text-xl lg:text-2xl font-semibold cursor-pointer relative group uppercase"
+              className="h-14 w-14 lg:h-20 lg:w-20 rounded-full bg-[#f5f5f3] flex items-center justify-center text-zinc-950 text-xl lg:text-2xl font-semibold cursor-pointer relative group uppercase"
               onClick={handlePhotoClick}
             >
               {user.profilePhoto ? (
@@ -44,7 +44,7 @@ export default function Profile() {
               )}
               <span className="h-full w-full absolute top-0 left-0 flex flex-col gap-1 items-center justify-center bg-zinc-500/50 rounded-full text-3xl text-white opacity-0 group-hover:opacity-100 transition-all">
                 {isLoading.photo ? (
-                  <span className="spinner h-[30px] w-[30px] border-4 border-blue-600 border-b-transparent rounded-full inline-block"></span>
+                  <span className="spinner h-[30px] w-[30px] border-4 border-zinc-950 border-b-transparent rounded-full inline-block"></span>
                 ) : (
                   <>
                     <FaCamera />
